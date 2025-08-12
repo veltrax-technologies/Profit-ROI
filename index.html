@@ -3,30 +3,16 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Veltrax — Profitability Impact Explorer (Cross‑Vertical)</title>
+<title>Veltrax — Simple ROI Estimator</title>
 <style>
-  /* ─────────────────────────────────────────────
-     Veltrax dark palette
-     ───────────────────────────────────────────── */
   :root{
-    --bg:#0F1220;           /* background */
-    --text:#E6E7EB;         /* primary text */
-    --muted:#A9B1C3;        /* secondary text */
-    --panel:#121832;        /* card background */
-    --panel2:#0F1633;       /* alt card */
-    --border:#22304F;       /* borders */
-    --accent:#6F42C1;       /* purple */
-    --primary:#0066FF;      /* blue */
-    --good:#20C997;         /* green */
-    --warn:#FFB454;         /* yellow */
-    --bad:#FF6B6B;          /* red */
+    --bg:#0F1220; --text:#E6E7EB; --muted:#A9B1C3; --panel:#121832; --panel2:#0F1633; --border:#22304F;
+    --accent:#6F42C1; --primary:#0066FF; --good:#20C997; --warn:#FFB454; --bad:#FF6B6B;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial,sans-serif}
-  a{color:var(--primary);text-decoration:none}
   .wrap{max-width:1180px;margin:0 auto;padding:16px}
-
   h1{margin:0 0 6px 0;font-size:24px}
   h2{margin:0 0 10px 0}
   .muted{color:var(--muted)}
@@ -35,27 +21,22 @@
   @media (min-width:1024px){ .grid{grid-template-columns:1fr 1fr} }
 
   .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
-  /* Inputs */
-  .presets{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-  .btn{border:1px solid var(--border);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,0));padding:9px 12px;border-radius:10px;color:var(--text);cursor:pointer;font-weight:700}
-  .btn:hover{filter:brightness(1.06)}
-  .btn.primary{background:linear-gradient(180deg,rgba(0,102,255,.25),rgba(0,102,255,.08));border-color:#1d4ed8}
-  .btn.ghost{background:transparent}
-
-  .field{display:grid;gap:6px;margin-bottom:10px}
   label{font-weight:700}
   input[type="number"]{appearance:textfield}
   input[type="number"]::-webkit-outer-spin-button,
   input[type="number"]::-webkit-inner-spin-button{appearance:none;margin:0}
   .input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0F1530;color:var(--text)}
   .input:focus{outline:2px solid var(--primary);outline-offset:2px}
+  .field{display:grid;gap:6px;margin-bottom:10px}
 
-  .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .btn{border:1px solid var(--border);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,0));padding:9px 12px;border-radius:10px;color:var(--text);cursor:pointer;font-weight:700}
+  .btn.primary{background:linear-gradient(180deg,rgba(0,102,255,.25),rgba(0,102,255,.08));border-color:#1d4ed8}
+  .btn:hover{filter:brightness(1.06)}
 
-  /* Results */
   .results{display:grid;grid-template-columns:1fr;gap:12px}
-  @media (min-width:680px){ .results{grid-template-columns:repeat(2,1fr)} }
+  @media (min-width:700px){ .results{grid-template-columns:repeat(2,1fr)} }
   @media (min-width:1024px){ .results{grid-template-columns:repeat(3,1fr)} }
 
   .metric{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:14px}
@@ -66,13 +47,6 @@
   .y{background:rgba(255,180,84,.2);color:#FFE1AF;border-color:rgba(255,180,84,.45)}
   .r{background:rgba(255,107,107,.2);color:#FFC2C2;border-color:rgba(255,107,107,.45)}
 
-  /* Waterfall */
-  .chart{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:10px}
-  svg{width:100%;height:220px}
-  .bar{shape-rendering:crispEdges}
-
-  /* Util */
-  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   .founders{margin:16px 0;border:2px solid var(--accent);background:linear-gradient(180deg,rgba(111,66,193,.12),rgba(111,66,193,.03));border-radius:14px;padding:14px}
   .teaser{margin:16px 0;border:1px dashed var(--border);border-radius:12px;padding:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:rgba(255,255,255,.03)}
   footer{color:var(--muted)}
@@ -81,96 +55,46 @@
 <body>
   <main class="wrap">
     <section class="card" aria-label="Intro">
-      <h1>Profitability Impact Explorer — Cross‑Vertical ROI</h1>
-      <div class="muted">Use broadly‑accepted drivers (loss reduction, operational time saved, approval/conversion lift) to estimate 12‑month ROI and break‑even. <strong>Every Veltrax app streams live ROI & audit logs</strong>, so once deployed you’ll watch these estimates converge to real savings and know exactly when the platform pays for itself.</div>
+      <h1>Profitability Impact — Simple ROI Estimator</h1>
+      <div class="muted">Fast, executive‑level view. Enter a few high‑level numbers and see estimated <strong>Ops Savings</strong>, <strong>Lift/Revenue Gain</strong>, <strong>Total Savings</strong>, <strong>12‑month ROI</strong>, and <strong>Break‑even days</strong>. Every Veltrax app streams <em>live ROI & immutable audit logs</em> so finance and compliance can verify when the platform pays for itself.</div>
     </section>
 
     <section class="grid" aria-label="Inputs and Results">
       <!-- Inputs -->
       <div class="card" aria-label="Inputs">
         <h2>Inputs</h2>
-        <div class="presets" role="group" aria-label="Presets">
-          <button class="btn ghost" data-preset="retail">Retail / E‑commerce</button>
-          <button class="btn ghost" data-preset="saas">B2B SaaS</button>
-          <button class="btn ghost" data-preset="finserv">Financial Services</button>
+        <div class="field">
+          <label for="rev">Annual revenue ($)</label>
+          <input id="rev" class="input" type="number" inputmode="decimal" min="0" step="100000" value="50000000">
         </div>
-
-        <h3 style="margin:10px 0 6px 0">Loss / Returns / Fraud</h3>
         <div class="two">
           <div class="field">
-            <label for="tx_day">Orders / Transactions per day</label>
-            <input id="tx_day" class="input" type="number" inputmode="numeric" min="0" step="100" value="50000" aria-label="Transactions per day">
+            <label for="margin">Gross margin (%)</label>
+            <input id="margin" class="input" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="40">
           </div>
           <div class="field">
-            <label for="avg_tx">Average order/tx value ($)</label>
-            <input id="avg_tx" class="input" type="number" inputmode="decimal" min="0" step="1" value="80">
-          </div>
-          <div class="field">
-            <label for="fraud_rate">Loss rate (returns/chargebacks/fraud) %</label>
-            <input id="fraud_rate" class="input" type="number" inputmode="decimal" min="0" max="100" step="0.01" value="0.18">
-          </div>
-          <div class="field">
-            <label for="uplift">Loss‑catch uplift from Veltrax (%)</label>
-            <input id="uplift" class="input" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="25">
-          </div>
-          <div class="field">
-            <label for="recovery">Recovery factor (%)</label>
-            <input id="recovery" class="input" type="number" inputmode="decimal" min="0" max="100" step="1" value="75">
+            <label for="ops">Annual operating cost ($)</label>
+            <input id="ops" class="input" type="number" inputmode="decimal" min="0" step="100000" value="12000000">
           </div>
         </div>
-
-        <h3 style="margin:10px 0 6px 0">Operations</h3>
         <div class="two">
           <div class="field">
-            <label for="reviews_day">Manual reviews / tickets per day</label>
-            <input id="reviews_day" class="input" type="number" inputmode="numeric" min="0" step="10" value="1200">
+            <label for="opsSave">Ops time saved (%)</label>
+            <input id="opsSave" class="input" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="8">
           </div>
           <div class="field">
-            <label for="min_saved">Minutes saved per review</label>
-            <input id="min_saved" class="input" type="number" inputmode="decimal" min="0" step="1" value="3">
-          </div>
-          <div class="field">
-            <label for="cost_hour">Loaded cost / hour ($)</label>
-            <input id="cost_hour" class="input" type="number" inputmode="decimal" min="0" step="1" value="48">
+            <label for="lift">Revenue lift (%)</label>
+            <input id="lift" class="input" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="1.5">
           </div>
         </div>
-
-        <h3 style="margin:10px 0 6px 0">Approvals / Conversions</h3>
-        <div class="two">
-          <div class="field">
-            <label for="apps_day">Applications / leads / carts per day</label>
-            <input id="apps_day" class="input" type="number" inputmode="numeric" min="0" step="50" value="2400">
-          </div>
-          <div class="field">
-            <label for="approval_rate">Base approval / conversion rate (%)</label>
-            <input id="approval_rate" class="input" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="42">
-          </div>
-          <div class="field">
-            <label for="auc_uplift">Lift from better models/LLMs (%)</label>
-            <input id="auc_uplift" class="input" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="2.5">
-          </div>
-          <div class="field">
-            <label for="margin_loan">Avg contribution margin per win ($)</label>
-            <input id="margin_loan" class="input" type="number" inputmode="decimal" min="0" step="10" value="280">
-          </div>
+        <div class="field">
+          <label for="program">Program cost / year ($) — e.g., internal budget</label>
+          <input id="program" class="input" type="number" inputmode="decimal" min="0" step="50000" value="0">
         </div>
-
-        <h3 style="margin:10px 0 6px 0">Cost</h3>
-        <div class="two">
-          <div class="field">
-            <label for="license">Veltrax license + infra / year ($)</label>
-            <input id="license" class="input" type="number" inputmode="decimal" min="0" step="1000" value="450000">
-          </div>
-          <div class="field">
-            <label for="coc">Cost of capital (%)</label>
-            <input id="coc" class="input" type="number" inputmode="decimal" min="0" step="0.1" value="8">
-          </div>
-        </div>
-
-        <div class="row" style="margin-top:8px">
-          <button id="reset" class="btn" aria-label="Reset to defaults">Reset</button>
-          <button id="csv" class="btn" aria-label="Download CSV">Download CSV</button>
-          <button id="copy" class="btn primary" aria-label="Copy snapshot">Copy Snapshot</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          <button id="calc" class="btn primary">Calculate</button>
+          <button id="copy" class="btn">Copy Snapshot</button>
+          <button id="csv" class="btn">Download CSV</button>
         </div>
       </div>
 
@@ -178,19 +102,14 @@
       <div class="card" aria-label="Results">
         <h2>Results</h2>
         <div class="results" aria-live="polite">
-          <div class="metric"><h3>Loss/Fraud Savings (12m)</h3><div id="fraud$" class="value">—</div></div>
           <div class="metric"><h3>Ops Savings (12m)</h3><div id="ops$" class="value">—</div></div>
-          <div class="metric"><h3>Lift‑Driven Margin (12m)</h3><div id="lift$" class="value">—</div></div>
+          <div class="metric"><h3>Lift / Revenue Gain (12m)</h3><div id="lift$" class="value">—</div></div>
           <div class="metric"><h3>Total Savings (12m)</h3><div id="total$" class="value">—</div></div>
-          <div class="metric"><h3>ROI (12m)</h3><div class="row"><div id="roi%" class="value">—</div><span id="badgeRoi" class="badge">—</span></div></div>
+          <div class="metric"><h3>ROI (12m)</h3><div class="value" id="roi%">—</div><div id="roiBadge" class="badge" style="margin-top:6px">—</div></div>
           <div class="metric"><h3>Break‑even (days)</h3><div id="breakeven" class="value">—</div></div>
-        </div>
-
-        <div class="chart" style="margin-top:12px">
-          <svg id="wf" viewBox="0 0 640 220" role="img" aria-label="Savings and cost waterfall">
-            <!-- bars injected here -->
-            Sorry, your browser does not support inline SVG.
-          </svg>
+          <div class="metric"><h3>Assumptions</h3>
+            <div class="muted" style="font-size:13px">Lift dollar impact uses margin: <span id="assumpMargin">—</span>. Break‑even assumes savings accrue evenly through the year.</div>
+          </div>
         </div>
       </div>
     </section>
@@ -203,130 +122,65 @@
       <a class="btn" href="PASTE_NEXT_URL_HERE">Open Finex Pages</a>
     </div>
 
-    <footer>Illustrative modeling; refined with your data during onboarding. In production, every Veltrax app streams immutable ROI & audit logs so finance and compliance can verify outcomes continuously.</footer>
+    <footer>Illustrative modeling; refined with your data during onboarding. In production, Veltrax streams live ROI & audit logs for every workflow.</footer>
   </main>
-
 <script>
-// ───────────────────────────────────────────────────────────
-// Helpers
-// ───────────────────────────────────────────────────────────
-const $ = (q)=>document.querySelector(q);
-const $$ = (q)=>document.querySelectorAll(q);
-const money = n => n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0});
-function clamp0(x){ return Math.max(0, x); }
+  const $ = (q)=>document.querySelector(q);
+  const money = n => n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0});
 
-// Cross‑vertical presets (public stats + typical Veltrax impact bands)
-const PRESETS = {
-  retail:  {tx_day:70000, avg_tx:68,  fraud_rate:0.15, uplift:18, recovery:70, reviews_day:900,  min_saved:3, cost_hour:35, apps_day:12000, approval_rate:6.0, auc_uplift:0.8, margin_loan:22,  license:350000, coc:8},
-  saas:    {tx_day:1800,  avg_tx:4200, fraud_rate:0.0,  uplift:0,  recovery:0,  reviews_day:260,  min_saved:6, cost_hour:55, apps_day:240,   approval_rate:18,  auc_uplift:3.0, margin_loan:18000, license:300000, coc:8},
-  finserv: {tx_day:50000, avg_tx:80,  fraud_rate:0.18, uplift:25, recovery:75, reviews_day:1200, min_saved:3, cost_hour:48, apps_day:2400,  approval_rate:42,  auc_uplift:2.5, margin_loan:280,  license:450000, coc:8}
-};
+  function calc(){
+    const rev   = Number($('#rev').value)||0;
+    const margin= (Number($('#margin').value)||0)/100;
+    const ops   = Number($('#ops').value)||0;
+    const opsSv = (Number($('#opsSave').value)||0)/100;
+    const lift  = (Number($('#lift').value)||0)/100;
+    const cost  = Number($('#program').value)||0;
 
-function applyPreset(k){ const p=PRESETS[k]; if(!p) return; Object.entries(p).forEach(([id,v])=>{ const el=$(`#${id}`); if(el) el.value=v;}); calc(); }
-$$('[data-preset]').forEach(b=> b.addEventListener('click', ()=>applyPreset(b.dataset.preset)));
-$('#reset').addEventListener('click', ()=>applyPreset('retail'));
+    // Simple, defensible estimates
+    const ops_savings = Math.max(0, ops * opsSv);
+    const lift_gain   = Math.max(0, rev * lift * margin); // lift converted to contribution dollars via margin
+    const total       = ops_savings + lift_gain;
 
-// Core calc
-function calc(){
-  const I = id=> Number($(`#${id}`).value)||0;
-  const tx_day=I('tx_day'), avg_tx=I('avg_tx'), fraud_rate=I('fraud_rate')/100, uplift=I('uplift')/100, recovery=I('recovery')/100;
-  const reviews_day=I('reviews_day'), min_saved=I('min_saved'), cost_hour=I('cost_hour');
-  const apps_day=I('apps_day'), approval_rate=I('approval_rate')/100, auc_uplift=I('auc_uplift')/100, margin_loan=I('margin_loan');
-  const license=I('license'), coc=I('coc')/100;
+    const roi = cost>0 ? (total - cost) / cost : NaN;
+    const daily_savings = total/365;
+    const breakeven = (cost>0 && daily_savings>0) ? Math.ceil(cost/daily_savings) : NaN;
 
-  // Loss/fraud savings
-  const baseline_loss_day = tx_day * avg_tx * fraud_rate; // $/day
-  const fraud_savings_day = clamp0(baseline_loss_day * uplift * recovery);
-  const fraud_savings = fraud_savings_day * 365;
+    // Update UI
+    $('#ops$').textContent   = money(ops_savings);
+    $('#lift$').textContent  = money(lift_gain);
+    $('#total$').textContent = money(total);
+    $('#roi%').textContent   = isFinite(roi) ? `${(roi*100).toFixed(0)}%` : '—';
+    const badge = $('#roiBadge');
+    if(isFinite(roi)){
+      badge.className = 'badge ' + (roi>1 ? 'g' : roi>0.25 ? 'y' : 'r');
+      badge.textContent = roi>1 ? 'Excellent' : roi>0.25 ? 'Good' : 'Needs review';
+    }else{ badge.className='badge'; badge.textContent='—'; }
+    $('#breakeven').textContent = isFinite(breakeven) ? breakeven : '—';
+    $('#assumpMargin').textContent = `${(margin*100).toFixed(0)}% gross margin`;
+  }
 
-  // Ops savings
-  const ops_hours_saved_day = (reviews_day * (min_saved/60));
-  const ops_savings_day = ops_hours_saved_day * cost_hour;
-  const ops_savings = ops_savings_day * 365;
-
-  // Conversion/approval lift margin
-  const extra_wins_day = apps_day * approval_rate * auc_uplift; // conservative: lift applies to current win base
-  const lift_margin_day = extra_wins_day * margin_loan;
-  const lift_margin = lift_margin_day * 365;
-
-  // Totals & ROI
-  const total_savings = fraud_savings + ops_savings + lift_margin;
-  const effective_cost = license * (1 + coc);
-  const roi = (total_savings - effective_cost) / (effective_cost||1);
-  const daily_savings = fraud_savings_day + ops_savings_day + lift_margin_day;
-  const break_even_days = daily_savings>0 ? Math.ceil(effective_cost / daily_savings) : Infinity;
-
-  // Update tiles
-  $('#fraud$').textContent = money(fraud_savings);
-  $('#ops$').textContent = money(ops_savings);
-  $('#lift$').textContent = money(lift_margin);
-  $('#total$').textContent = money(total_savings);
-  $('#roi%').textContent = `${(roi*100).toFixed(0)}%`;
-  const badge = $('#badgeRoi');
-  badge.className = 'badge ' + (roi>1 ? 'g' : roi>0.25 ? 'y' : 'r');
-  badge.textContent = roi>1 ? 'Excellent' : roi>0.25 ? 'Good' : 'Needs review';
-  $('#breakeven').textContent = isFinite(break_even_days) ? break_even_days.toString() : '—';
-
-  drawWaterfall(fraud_savings, ops_savings, lift_margin, effective_cost, total_savings);
-}
-
-function drawWaterfall(fraud, ops, lift, cost, total){
-  const svg = $('#wf'); svg.innerHTML='';
-  const W=640,H=220,P=36; const barW=70, gap=35; const items=[
-    {label:'Loss', val:fraud, color:'#20C997'},
-    {label:'Ops',  val:ops,   color:'#4AD6B1'},
-    {label:'Lift', val:lift,  color:'#7FE3CD'},
-    {label:'Cost', val:-cost, color:'#FF6B6B'},
-    {label:'Net',  val:total-cost, color:'#6F42C1'}
-  ];
-  const maxV = Math.max(...items.map(i=>Math.abs(i.val))) || 1;
-  const scale = v => (H-P*2) * (Math.abs(v)/maxV);
-  let x=P, yBase=H-P;
-  items.forEach(i=>{
-    const h = Math.max(2, scale(i.val));
-    const y = i.val>=0 ? yBase - h : yBase;
-    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
-    const r=document.createElementNS('http://www.w3.org/2000/svg','rect');
-    r.setAttribute('x',x); r.setAttribute('y',y); r.setAttribute('width',barW); r.setAttribute('height',h); r.setAttribute('fill',i.color); r.setAttribute('class','bar');
-    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
-    t.setAttribute('x',x+barW/2); t.setAttribute('y',y-6); t.setAttribute('text-anchor','middle'); t.setAttribute('fill','#C9D2E6'); t.setAttribute('font-size','12');
-    t.textContent=i.label;
-    g.appendChild(r); g.appendChild(t); svg.appendChild(g); x+=barW+gap;
+  // Copy & CSV
+  $('#copy').addEventListener('click',()=>{
+    const snap = {
+      inputs:{ rev:$('#rev').value, margin:$('#margin').value, ops:$('#ops').value, opsSave:$('#opsSave').value, lift:$('#lift').value, program:$('#program').value },
+      outputs:{ ops:$('#ops$').textContent, lift:$('#lift$').textContent, total:$('#total$').textContent, roi:$('#roi%').textContent, breakeven:$('#breakeven').textContent }
+    };
+    navigator.clipboard.writeText(JSON.stringify(snap,null,2)).then(()=>{ $('#copy').textContent='Copied!'; setTimeout(()=>$('#copy').textContent='Copy Snapshot',900); });
   });
-  const axis=document.createElementNS('http://www.w3.org/2000/svg','line'); axis.setAttribute('x1',P-10); axis.setAttribute('y1',yBase); axis.setAttribute('x2',W-P+10); axis.setAttribute('y2',yBase); axis.setAttribute('stroke','#3a4564'); axis.setAttribute('stroke-width','1'); svg.appendChild(axis);
-}
 
-// Copy / CSV
-$('#copy').addEventListener('click',()=>{
-  const val = k=> document.querySelector(`#${k}`).value;
-  const snap = {
-    inputs:{ tx_day:val('tx_day'), avg_tx:val('avg_tx'), loss_rate:val('fraud_rate'), uplift:val('uplift'), recovery:val('recovery'), reviews_day:val('reviews_day'), min_saved:val('min_saved'), cost_hour:val('cost_hour'), apps_day:val('apps_day'), base_rate:val('approval_rate'), lift:val('auc_uplift'), margin:val('margin_loan'), license:val('license'), coc:val('coc') },
-    outputs:{ loss: $('#fraud$').textContent, ops: $('#ops$').textContent, lift: $('#lift$').textContent, total: $('#total$').textContent, roi: $('#roi%').textContent, breakeven: $('#breakeven').textContent }
-  };
-  navigator.clipboard.writeText(JSON.stringify(snap,null,2)).then(()=>{ $('#copy').textContent='Copied!'; setTimeout(()=>$('#copy').textContent='Copy Snapshot',900); });
-});
+  $('#csv').addEventListener('click',()=>{
+    const rows=[['Metric','Value'],['Ops Savings (12m)', $('#ops$').textContent],['Lift / Revenue Gain (12m)', $('#lift$').textContent],['Total Savings (12m)', $('#total$').textContent],['ROI (12m)', $('#roi%').textContent],['Break‑even (days)', $('#breakeven').textContent]];
+    const csv = rows.map(r=>r.join(',')).join('\n');
+    const blob = new Blob([csv],{type:'text/csv'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='veltrax_simple_roi_snapshot.csv'; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },0);
+  });
 
-$('#csv').addEventListener('click',()=>{
-  const rows=[
-    ['Metric','Value'],
-    ['Loss/Fraud Savings (12m)', $('#fraud$').textContent],
-    ['Ops Savings (12m)', $('#ops$').textContent],
-    ['Lift‑Driven Margin (12m)', $('#lift$').textContent],
-    ['Total Savings (12m)', $('#total$').textContent],
-    ['ROI (12m)', $('#roi%').textContent],
-    ['Break‑even (days)', $('#breakeven').textContent]
-  ];
-  const csv = rows.map(r=>r.join(',')).join('\n');
-  const blob = new Blob([csv], {type:'text/csv'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='veltrax_roi_snapshot.csv'; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 0);
-});
+  // Live + button
+  document.querySelectorAll('input').forEach(i=> i.addEventListener('input', calc));
+  $('#calc').addEventListener('click', calc);
 
-// Live updates
-$$('input').forEach(i=> i.addEventListener('input', calc));
-
-// Init
-applyPreset('retail');
-calc();
+  // Init
+  calc();
 </script>
 </body>
 </html>

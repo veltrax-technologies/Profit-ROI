@@ -3,42 +3,36 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Veltrax — Simple ROI Estimator</title>
+<title>Veltrax — Two‑Input ROI Estimator</title>
 <style>
-  :root{
-    --bg:#0F1220; --text:#E6E7EB; --muted:#A9B1C3; --panel:#121832; --panel2:#0F1633; --border:#22304F;
-    --accent:#6F42C1; --primary:#0066FF; --good:#20C997; --warn:#FFB454; --bad:#FF6B6B;
-  }
+  :root{ --bg:#0F1220; --text:#E6E7EB; --muted:#A9B1C3; --panel:#121832; --panel2:#0F1633; --border:#22304F; --accent:#6F42C1; --primary:#0066FF; --good:#20C997; --warn:#FFB454; --bad:#FF6B6B }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial,sans-serif}
   .wrap{max-width:1180px;margin:0 auto;padding:16px}
-  h1{margin:0 0 6px 0;font-size:24px}
+  h1{margin:0 0 8px 0;font-size:24px}
   h2{margin:0 0 10px 0}
   .muted{color:var(--muted)}
-
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px}
   .grid{display:grid;grid-template-columns:1fr;gap:16px}
   @media (min-width:1024px){ .grid{grid-template-columns:1fr 1fr} }
 
-  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px}
-  .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-
+  /* Inputs */
   label{font-weight:700}
+  .field{display:grid;gap:6px;margin-bottom:12px}
   input[type="number"]{appearance:textfield}
-  input[type="number"]::-webkit-outer-spin-button,
-  input[type="number"]::-webkit-inner-spin-button{appearance:none;margin:0}
+  input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button{appearance:none;margin:0}
   .input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0F1530;color:var(--text)}
   .input:focus{outline:2px solid var(--primary);outline-offset:2px}
-  .field{display:grid;gap:6px;margin-bottom:10px}
-
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   .btn{border:1px solid var(--border);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,0));padding:9px 12px;border-radius:10px;color:var(--text);cursor:pointer;font-weight:700}
   .btn.primary{background:linear-gradient(180deg,rgba(0,102,255,.25),rgba(0,102,255,.08));border-color:#1d4ed8}
   .btn:hover{filter:brightness(1.06)}
 
+  /* Results */
   .results{display:grid;grid-template-columns:1fr;gap:12px}
-  @media (min-width:700px){ .results{grid-template-columns:repeat(2,1fr)} }
+  @media (min-width:720px){ .results{grid-template-columns:repeat(2,1fr)} }
   @media (min-width:1024px){ .results{grid-template-columns:repeat(3,1fr)} }
-
   .metric{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:14px}
   .metric h3{margin:0 0 4px 0;font-size:14px;color:#C9D2E6}
   .value{font-size:26px;font-weight:800}
@@ -46,6 +40,9 @@
   .g{background:rgba(32,201,151,.18);color:#9CF0D5;border-color:rgba(32,201,151,.45)}
   .y{background:rgba(255,180,84,.2);color:#FFE1AF;border-color:rgba(255,180,84,.45)}
   .r{background:rgba(255,107,107,.2);color:#FFC2C2;border-color:rgba(255,107,107,.45)}
+
+  .info{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid var(--border);font-weight:900;font-size:12px;color:#D7DBE6;position:relative}
+  .info[data-tip]:hover::after{content:attr(data-tip);position:absolute;left:50%;transform:translateX(-50%);bottom:130%;width:max-content;max-width:280px;background:#0b1226;color:#dfe8ff;border:1px solid #1f2b44;padding:8px 10px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.35)}
 
   .founders{margin:16px 0;border:2px solid var(--accent);background:linear-gradient(180deg,rgba(111,66,193,.12),rgba(111,66,193,.03));border-radius:14px;padding:14px}
   .teaser{margin:16px 0;border:1px dashed var(--border);border-radius:12px;padding:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:rgba(255,255,255,.03)}
@@ -55,8 +52,8 @@
 <body>
   <main class="wrap">
     <section class="card" aria-label="Intro">
-      <h1>Profitability Impact — Simple ROI Estimator</h1>
-      <div class="muted">Fast, executive‑level view. Enter a few high‑level numbers and see estimated <strong>Ops Savings</strong>, <strong>Lift/Revenue Gain</strong>, <strong>Total Savings</strong>, <strong>12‑month ROI</strong>, and <strong>Break‑even days</strong>. Every Veltrax app streams <em>live ROI & immutable audit logs</em> so finance and compliance can verify when the platform pays for itself.</div>
+      <h1>Two‑Input ROI Estimator</h1>
+      <div class="muted">A 10‑second look at potential impact using Veltrax baseline assumptions. Enter <strong>Annual revenue</strong> and <strong>Annual operating cost</strong>. We estimate <em>Ops Savings</em>, <em>Lift/Revenue Gain</em>, <em>Total Savings</em>, <em>ROI</em>, and <em>Break‑even days</em>. In production, every app streams live ROI & immutable audit logs so finance and compliance can verify outcomes continuously.</div>
     </section>
 
     <section class="grid" aria-label="Inputs and Results">
@@ -65,36 +62,15 @@
         <h2>Inputs</h2>
         <div class="field">
           <label for="rev">Annual revenue ($)</label>
-          <input id="rev" class="input" type="number" inputmode="decimal" min="0" step="100000" value="50000000">
-        </div>
-        <div class="two">
-          <div class="field">
-            <label for="margin">Gross margin (%)</label>
-            <input id="margin" class="input" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="40">
-          </div>
-          <div class="field">
-            <label for="ops">Annual operating cost ($)</label>
-            <input id="ops" class="input" type="number" inputmode="decimal" min="0" step="100000" value="12000000">
-          </div>
-        </div>
-        <div class="two">
-          <div class="field">
-            <label for="opsSave">Ops time saved (%)</label>
-            <input id="opsSave" class="input" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="8">
-          </div>
-          <div class="field">
-            <label for="lift">Revenue lift (%)</label>
-            <input id="lift" class="input" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="1.5">
-          </div>
+          <input id="rev" class="input" type="number" inputmode="decimal" min="0" step="100000" value="50000000" aria-label="Annual revenue">
         </div>
         <div class="field">
-          <label for="program">Program cost / year ($) — e.g., internal budget</label>
-          <input id="program" class="input" type="number" inputmode="decimal" min="0" step="50000" value="0">
+          <label for="ops">Annual operating cost ($)</label>
+          <input id="ops" class="input" type="number" inputmode="decimal" min="0" step="100000" value="12000000" aria-label="Annual operating cost">
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-          <button id="calc" class="btn primary">Calculate</button>
-          <button id="copy" class="btn">Copy Snapshot</button>
-          <button id="csv" class="btn">Download CSV</button>
+        <div class="row" style="margin-top:6px">
+          <button id="calc" class="btn primary" aria-label="Calculate">Calculate</button>
+          <span class="info" data-tip="Uses Veltrax baseline assumptions hidden under the hood (ops savings %, revenue lift %, gross margin, program budget fraction). These can be tuned during scoping to match your domain.">i</span>
         </div>
       </div>
 
@@ -108,7 +84,7 @@
           <div class="metric"><h3>ROI (12m)</h3><div class="value" id="roi%">—</div><div id="roiBadge" class="badge" style="margin-top:6px">—</div></div>
           <div class="metric"><h3>Break‑even (days)</h3><div id="breakeven" class="value">—</div></div>
           <div class="metric"><h3>Assumptions</h3>
-            <div class="muted" style="font-size:13px">Lift dollar impact uses margin: <span id="assumpMargin">—</span>. Break‑even assumes savings accrue evenly through the year.</div>
+            <div id="assump" class="muted" style="font-size:13px">—</div>
           </div>
         </div>
       </div>
@@ -118,66 +94,54 @@
       <strong>Founders deal:</strong> 30% upfront with milestone deliveries. First 5 get <strong>15% off</strong> + <strong>1 year support</strong>.
     </div>
     <div class="teaser" role="region" aria-label="Next step">
-      <div><strong>Next:</strong> Finex Product Pages — banking‑specific simulators & demos.</div>
-      <a class="btn" href="PASTE_NEXT_URL_HERE">Open Finex Pages</a>
+      <div><strong>Next:</strong> Profitability Impact Explorer — model your savings, ROI, and break‑even.</div>
+      <a class="btn" href="PASTE_NEXT_URL_HERE">Open ROI Explorer</a>
     </div>
 
-    <footer>Illustrative modeling; refined with your data during onboarding. In production, Veltrax streams live ROI & audit logs for every workflow.</footer>
+    <footer>Illustrative modeling; refined with your data during onboarding. Veltrax tracks live ROI in‑product with immutable audit logs.</footer>
   </main>
 <script>
   const $ = (q)=>document.querySelector(q);
   const money = n => n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0});
 
+  // ─────────────────────────────────────────────
+  // "Under the hood" baselines — easy to tune
+  // ─────────────────────────────────────────────
+  const OPS_SAVE_BASELINE = 0.08;     // 8% reduction of operating cost
+  const REVENUE_LIFT_BASELINE = 0.015;// 1.5% revenue lift
+  const GROSS_MARGIN_ASSUME = 0.40;   // 40% gross margin -> turn lift into margin dollars
+  const PROGRAM_COST_FACTOR = 0.0065; // ~0.65% of operating cost (blended license+infra) — illustrative
+  const MIN_PROGRAM_COST = 200000;    // floor so very small orgs still see realistic payback
+
   function calc(){
-    const rev   = Number($('#rev').value)||0;
-    const margin= (Number($('#margin').value)||0)/100;
-    const ops   = Number($('#ops').value)||0;
-    const opsSv = (Number($('#opsSave').value)||0)/100;
-    const lift  = (Number($('#lift').value)||0)/100;
-    const cost  = Number($('#program').value)||0;
+    const rev = Number($('#rev').value)||0;
+    const ops = Number($('#ops').value)||0;
 
-    // Simple, defensible estimates
-    const ops_savings = Math.max(0, ops * opsSv);
-    const lift_gain   = Math.max(0, rev * lift * margin); // lift converted to contribution dollars via margin
-    const total       = ops_savings + lift_gain;
+    const opsSavings = Math.max(0, ops * OPS_SAVE_BASELINE);
+    const liftGain   = Math.max(0, rev * REVENUE_LIFT_BASELINE * GROSS_MARGIN_ASSUME);
+    const total      = opsSavings + liftGain;
 
-    const roi = cost>0 ? (total - cost) / cost : NaN;
-    const daily_savings = total/365;
-    const breakeven = (cost>0 && daily_savings>0) ? Math.ceil(cost/daily_savings) : NaN;
+    const programCost = Math.max(MIN_PROGRAM_COST, ops * PROGRAM_COST_FACTOR);
+    const roi = (total - programCost) / programCost;
+    const daily = total/365;
+    const breakeven = daily>0 ? Math.ceil(programCost/daily) : NaN;
 
-    // Update UI
-    $('#ops$').textContent   = money(ops_savings);
-    $('#lift$').textContent  = money(lift_gain);
+    // UI
+    $('#ops$').textContent   = money(opsSavings);
+    $('#lift$').textContent  = money(liftGain);
     $('#total$').textContent = money(total);
-    $('#roi%').textContent   = isFinite(roi) ? `${(roi*100).toFixed(0)}%` : '—';
+    $('#roi%').textContent   = `${(roi*100).toFixed(0)}%`;
     const badge = $('#roiBadge');
-    if(isFinite(roi)){
-      badge.className = 'badge ' + (roi>1 ? 'g' : roi>0.25 ? 'y' : 'r');
-      badge.textContent = roi>1 ? 'Excellent' : roi>0.25 ? 'Good' : 'Needs review';
-    }else{ badge.className='badge'; badge.textContent='—'; }
+    badge.className = 'badge ' + (roi>1 ? 'g' : roi>0.25 ? 'y' : 'r');
+    badge.textContent = roi>1 ? 'Excellent' : roi>0.25 ? 'Good' : 'Needs review';
     $('#breakeven').textContent = isFinite(breakeven) ? breakeven : '—';
-    $('#assumpMargin').textContent = `${(margin*100).toFixed(0)}% gross margin`;
+
+    $('#assump').textContent = `Using ${Math.round(OPS_SAVE_BASELINE*100)}% ops savings, ${Math.round(REVENUE_LIFT_BASELINE*100)}% revenue lift @ ${(GROSS_MARGIN_ASSUME*100).toFixed(0)}% margin; program budget ≈ ${(PROGRAM_COST_FACTOR*100).toFixed(2)}% of OpEx (min ${money(MIN_PROGRAM_COST)}).`;
   }
 
-  // Copy & CSV
-  $('#copy').addEventListener('click',()=>{
-    const snap = {
-      inputs:{ rev:$('#rev').value, margin:$('#margin').value, ops:$('#ops').value, opsSave:$('#opsSave').value, lift:$('#lift').value, program:$('#program').value },
-      outputs:{ ops:$('#ops$').textContent, lift:$('#lift$').textContent, total:$('#total$').textContent, roi:$('#roi%').textContent, breakeven:$('#breakeven').textContent }
-    };
-    navigator.clipboard.writeText(JSON.stringify(snap,null,2)).then(()=>{ $('#copy').textContent='Copied!'; setTimeout(()=>$('#copy').textContent='Copy Snapshot',900); });
-  });
-
-  $('#csv').addEventListener('click',()=>{
-    const rows=[['Metric','Value'],['Ops Savings (12m)', $('#ops$').textContent],['Lift / Revenue Gain (12m)', $('#lift$').textContent],['Total Savings (12m)', $('#total$').textContent],['ROI (12m)', $('#roi%').textContent],['Break‑even (days)', $('#breakeven').textContent]];
-    const csv = rows.map(r=>r.join(',')).join('\n');
-    const blob = new Blob([csv],{type:'text/csv'});
-    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='veltrax_simple_roi_snapshot.csv'; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },0);
-  });
-
-  // Live + button
-  document.querySelectorAll('input').forEach(i=> i.addEventListener('input', calc));
+  // Interactions
   $('#calc').addEventListener('click', calc);
+  document.querySelectorAll('input').forEach(i=> i.addEventListener('input', calc));
 
   // Init
   calc();

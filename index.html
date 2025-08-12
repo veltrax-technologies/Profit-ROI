@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Veltrax — Profitability Impact Explorer</title>
+<title>Veltrax — Profitability Impact Explorer (Cross‑Vertical)</title>
 <style>
   /* ─────────────────────────────────────────────
      Veltrax dark palette
@@ -82,7 +82,7 @@
   <main class="wrap">
     <section class="card" aria-label="Intro">
       <h1>Profitability Impact Explorer — Cross‑Vertical ROI</h1>
-      <div class="muted">Enter a few business inputs to estimate Fraud Savings, Ops Savings, Approval‑Lift Margin, 12‑month ROI, and break‑even. Updates live.</div>
+      <div class="muted">Use broadly‑accepted drivers (loss reduction, operational time saved, approval/conversion lift) to estimate 12‑month ROI and break‑even. <strong>Every Veltrax app streams live ROI & audit logs</strong>, so once deployed you’ll watch these estimates converge to real savings and know exactly when the platform pays for itself.</div>
     </section>
 
     <section class="grid" aria-label="Inputs and Results">
@@ -90,27 +90,27 @@
       <div class="card" aria-label="Inputs">
         <h2>Inputs</h2>
         <div class="presets" role="group" aria-label="Presets">
-          <button class="btn ghost" data-preset="regional">Regional bank</button>
-          <button class="btn ghost" data-preset="credit">Credit union</button>
-          <button class="btn ghost" data-preset="enterprise">Enterprise</button>
+          <button class="btn ghost" data-preset="retail">Retail / E‑commerce</button>
+          <button class="btn ghost" data-preset="saas">B2B SaaS</button>
+          <button class="btn ghost" data-preset="finserv">Financial Services</button>
         </div>
 
-        <h3 style="margin:10px 0 6px 0">Fraud/Loss</h3>
+        <h3 style="margin:10px 0 6px 0">Loss / Returns / Fraud</h3>
         <div class="two">
           <div class="field">
-            <label for="tx_day">Tx volume / day</label>
+            <label for="tx_day">Orders / Transactions per day</label>
             <input id="tx_day" class="input" type="number" inputmode="numeric" min="0" step="100" value="50000" aria-label="Transactions per day">
           </div>
           <div class="field">
-            <label for="avg_tx">Avg tx value ($)</label>
+            <label for="avg_tx">Average order/tx value ($)</label>
             <input id="avg_tx" class="input" type="number" inputmode="decimal" min="0" step="1" value="80">
           </div>
           <div class="field">
-            <label for="fraud_rate">Fraud loss rate (%)</label>
+            <label for="fraud_rate">Loss rate (returns/chargebacks/fraud) %</label>
             <input id="fraud_rate" class="input" type="number" inputmode="decimal" min="0" max="100" step="0.01" value="0.18">
           </div>
           <div class="field">
-            <label for="uplift">Catch‑uplift (%)</label>
+            <label for="uplift">Loss‑catch uplift from Veltrax (%)</label>
             <input id="uplift" class="input" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="25">
           </div>
           <div class="field">
@@ -122,11 +122,11 @@
         <h3 style="margin:10px 0 6px 0">Operations</h3>
         <div class="two">
           <div class="field">
-            <label for="reviews_day">Manual reviews / day</label>
+            <label for="reviews_day">Manual reviews / tickets per day</label>
             <input id="reviews_day" class="input" type="number" inputmode="numeric" min="0" step="10" value="1200">
           </div>
           <div class="field">
-            <label for="min_saved">Time saved / review (min)</label>
+            <label for="min_saved">Minutes saved per review</label>
             <input id="min_saved" class="input" type="number" inputmode="decimal" min="0" step="1" value="3">
           </div>
           <div class="field">
@@ -135,22 +135,22 @@
           </div>
         </div>
 
-        <h3 style="margin:10px 0 6px 0">Approvals</h3>
+        <h3 style="margin:10px 0 6px 0">Approvals / Conversions</h3>
         <div class="two">
           <div class="field">
-            <label for="apps_day">Applications / day</label>
+            <label for="apps_day">Applications / leads / carts per day</label>
             <input id="apps_day" class="input" type="number" inputmode="numeric" min="0" step="50" value="2400">
           </div>
           <div class="field">
-            <label for="approval_rate">Approval rate (%)</label>
+            <label for="approval_rate">Base approval / conversion rate (%)</label>
             <input id="approval_rate" class="input" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="42">
           </div>
           <div class="field">
-            <label for="auc_uplift">AUC uplift → approval lift (%)</label>
+            <label for="auc_uplift">Lift from better models/LLMs (%)</label>
             <input id="auc_uplift" class="input" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="2.5">
           </div>
           <div class="field">
-            <label for="margin_loan">Avg margin / loan ($)</label>
+            <label for="margin_loan">Avg contribution margin per win ($)</label>
             <input id="margin_loan" class="input" type="number" inputmode="decimal" min="0" step="10" value="280">
           </div>
         </div>
@@ -158,7 +158,7 @@
         <h3 style="margin:10px 0 6px 0">Cost</h3>
         <div class="two">
           <div class="field">
-            <label for="license">License price / year ($)</label>
+            <label for="license">Veltrax license + infra / year ($)</label>
             <input id="license" class="input" type="number" inputmode="decimal" min="0" step="1000" value="450000">
           </div>
           <div class="field">
@@ -178,9 +178,9 @@
       <div class="card" aria-label="Results">
         <h2>Results</h2>
         <div class="results" aria-live="polite">
-          <div class="metric"><h3>Fraud Savings (12m)</h3><div id="fraud$" class="value">—</div></div>
+          <div class="metric"><h3>Loss/Fraud Savings (12m)</h3><div id="fraud$" class="value">—</div></div>
           <div class="metric"><h3>Ops Savings (12m)</h3><div id="ops$" class="value">—</div></div>
-          <div class="metric"><h3>Approval‑Lift Margin (12m)</h3><div id="lift$" class="value">—</div></div>
+          <div class="metric"><h3>Lift‑Driven Margin (12m)</h3><div id="lift$" class="value">—</div></div>
           <div class="metric"><h3>Total Savings (12m)</h3><div id="total$" class="value">—</div></div>
           <div class="metric"><h3>ROI (12m)</h3><div class="row"><div id="roi%" class="value">—</div><span id="badgeRoi" class="badge">—</span></div></div>
           <div class="metric"><h3>Break‑even (days)</h3><div id="breakeven" class="value">—</div></div>
@@ -203,7 +203,7 @@
       <a class="btn" href="PASTE_NEXT_URL_HERE">Open Finex Pages</a>
     </div>
 
-    <footer>Illustrative modeling; refined with your data on onboarding.</footer>
+    <footer>Illustrative modeling; refined with your data during onboarding. In production, every Veltrax app streams immutable ROI & audit logs so finance and compliance can verify outcomes continuously.</footer>
   </main>
 
 <script>
@@ -213,19 +213,18 @@
 const $ = (q)=>document.querySelector(q);
 const $$ = (q)=>document.querySelectorAll(q);
 const money = n => n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0});
-const pct = n => `${(n*100).toFixed(1)}%`;
 function clamp0(x){ return Math.max(0, x); }
 
-// Presets
+// Cross‑vertical presets (public stats + typical Veltrax impact bands)
 const PRESETS = {
-  regional: {tx_day:50000, avg_tx:80, fraud_rate:0.18, uplift:25, recovery:75, reviews_day:1200, min_saved:3, cost_hour:48, apps_day:2400, approval_rate:42, auc_uplift:2.5, margin_loan:280, license:450000, coc:8},
-  credit:   {tx_day:18000, avg_tx:72, fraud_rate:0.12, uplift:18, recovery:70, reviews_day:450,  min_saved:4, cost_hour:42, apps_day:900,  approval_rate:44, auc_uplift:2.0, margin_loan:210, license:210000, coc:6},
-  enterprise:{tx_day:160000,avg_tx:96, fraud_rate:0.22, uplift:28, recovery:80, reviews_day:3800, min_saved:2, cost_hour:55, apps_day:7200, approval_rate:40, auc_uplift:3.2, margin_loan:340, license:950000, coc:9}
+  retail:  {tx_day:70000, avg_tx:68,  fraud_rate:0.15, uplift:18, recovery:70, reviews_day:900,  min_saved:3, cost_hour:35, apps_day:12000, approval_rate:6.0, auc_uplift:0.8, margin_loan:22,  license:350000, coc:8},
+  saas:    {tx_day:1800,  avg_tx:4200, fraud_rate:0.0,  uplift:0,  recovery:0,  reviews_day:260,  min_saved:6, cost_hour:55, apps_day:240,   approval_rate:18,  auc_uplift:3.0, margin_loan:18000, license:300000, coc:8},
+  finserv: {tx_day:50000, avg_tx:80,  fraud_rate:0.18, uplift:25, recovery:75, reviews_day:1200, min_saved:3, cost_hour:48, apps_day:2400,  approval_rate:42,  auc_uplift:2.5, margin_loan:280,  license:450000, coc:8}
 };
 
 function applyPreset(k){ const p=PRESETS[k]; if(!p) return; Object.entries(p).forEach(([id,v])=>{ const el=$(`#${id}`); if(el) el.value=v;}); calc(); }
 $$('[data-preset]').forEach(b=> b.addEventListener('click', ()=>applyPreset(b.dataset.preset)));
-$('#reset').addEventListener('click', ()=>applyPreset('regional'));
+$('#reset').addEventListener('click', ()=>applyPreset('retail'));
 
 // Core calc
 function calc(){
@@ -235,7 +234,7 @@ function calc(){
   const apps_day=I('apps_day'), approval_rate=I('approval_rate')/100, auc_uplift=I('auc_uplift')/100, margin_loan=I('margin_loan');
   const license=I('license'), coc=I('coc')/100;
 
-  // Fraud savings
+  // Loss/fraud savings
   const baseline_loss_day = tx_day * avg_tx * fraud_rate; // $/day
   const fraud_savings_day = clamp0(baseline_loss_day * uplift * recovery);
   const fraud_savings = fraud_savings_day * 365;
@@ -245,22 +244,22 @@ function calc(){
   const ops_savings_day = ops_hours_saved_day * cost_hour;
   const ops_savings = ops_savings_day * 365;
 
-  // Approval lift margin
-  const extra_approvals_day = apps_day * approval_rate * auc_uplift; // conservative: treat uplift as relative to approved base
-  const approval_margin_day = extra_approvals_day * margin_loan;
-  const approval_margin = approval_margin_day * 365;
+  // Conversion/approval lift margin
+  const extra_wins_day = apps_day * approval_rate * auc_uplift; // conservative: lift applies to current win base
+  const lift_margin_day = extra_wins_day * margin_loan;
+  const lift_margin = lift_margin_day * 365;
 
   // Totals & ROI
-  const total_savings = fraud_savings + ops_savings + approval_margin;
+  const total_savings = fraud_savings + ops_savings + lift_margin;
   const effective_cost = license * (1 + coc);
   const roi = (total_savings - effective_cost) / (effective_cost||1);
-  const daily_savings = fraud_savings_day + ops_savings_day + approval_margin_day;
+  const daily_savings = fraud_savings_day + ops_savings_day + lift_margin_day;
   const break_even_days = daily_savings>0 ? Math.ceil(effective_cost / daily_savings) : Infinity;
 
   // Update tiles
   $('#fraud$').textContent = money(fraud_savings);
   $('#ops$').textContent = money(ops_savings);
-  $('#lift$').textContent = money(approval_margin);
+  $('#lift$').textContent = money(lift_margin);
   $('#total$').textContent = money(total_savings);
   $('#roi%').textContent = `${(roi*100).toFixed(0)}%`;
   const badge = $('#badgeRoi');
@@ -268,17 +267,17 @@ function calc(){
   badge.textContent = roi>1 ? 'Excellent' : roi>0.25 ? 'Good' : 'Needs review';
   $('#breakeven').textContent = isFinite(break_even_days) ? break_even_days.toString() : '—';
 
-  drawWaterfall(fraud_savings, ops_savings, approval_margin, effective_cost, total_savings);
+  drawWaterfall(fraud_savings, ops_savings, lift_margin, effective_cost, total_savings);
 }
 
 function drawWaterfall(fraud, ops, lift, cost, total){
   const svg = $('#wf'); svg.innerHTML='';
   const W=640,H=220,P=36; const barW=70, gap=35; const items=[
-    {label:'Fraud', val:fraud, color:'#20C997'},
-    {label:'Ops',   val:ops,   color:'#4AD6B1'},
-    {label:'Lift',  val:lift,  color:'#7FE3CD'},
-    {label:'Cost',  val:-cost, color:'#FF6B6B'},
-    {label:'Net',   val:total-cost, color:'#6F42C1'}
+    {label:'Loss', val:fraud, color:'#20C997'},
+    {label:'Ops',  val:ops,   color:'#4AD6B1'},
+    {label:'Lift', val:lift,  color:'#7FE3CD'},
+    {label:'Cost', val:-cost, color:'#FF6B6B'},
+    {label:'Net',  val:total-cost, color:'#6F42C1'}
   ];
   const maxV = Math.max(...items.map(i=>Math.abs(i.val))) || 1;
   const scale = v => (H-P*2) * (Math.abs(v)/maxV);
@@ -294,7 +293,6 @@ function drawWaterfall(fraud, ops, lift, cost, total){
     t.textContent=i.label;
     g.appendChild(r); g.appendChild(t); svg.appendChild(g); x+=barW+gap;
   });
-  // axis
   const axis=document.createElementNS('http://www.w3.org/2000/svg','line'); axis.setAttribute('x1',P-10); axis.setAttribute('y1',yBase); axis.setAttribute('x2',W-P+10); axis.setAttribute('y2',yBase); axis.setAttribute('stroke','#3a4564'); axis.setAttribute('stroke-width','1'); svg.appendChild(axis);
 }
 
@@ -302,8 +300,8 @@ function drawWaterfall(fraud, ops, lift, cost, total){
 $('#copy').addEventListener('click',()=>{
   const val = k=> document.querySelector(`#${k}`).value;
   const snap = {
-    inputs:{ tx_day:val('tx_day'), avg_tx:val('avg_tx'), fraud_rate:val('fraud_rate'), uplift:val('uplift'), recovery:val('recovery'), reviews_day:val('reviews_day'), min_saved:val('min_saved'), cost_hour:val('cost_hour'), apps_day:val('apps_day'), approval_rate:val('approval_rate'), auc_uplift:val('auc_uplift'), margin_loan:val('margin_loan'), license:val('license'), coc:val('coc') },
-    outputs:{ fraud: $('#fraud$').textContent, ops: $('#ops$').textContent, lift: $('#lift$').textContent, total: $('#total$').textContent, roi: $('#roi%').textContent, breakeven: $('#breakeven').textContent }
+    inputs:{ tx_day:val('tx_day'), avg_tx:val('avg_tx'), loss_rate:val('fraud_rate'), uplift:val('uplift'), recovery:val('recovery'), reviews_day:val('reviews_day'), min_saved:val('min_saved'), cost_hour:val('cost_hour'), apps_day:val('apps_day'), base_rate:val('approval_rate'), lift:val('auc_uplift'), margin:val('margin_loan'), license:val('license'), coc:val('coc') },
+    outputs:{ loss: $('#fraud$').textContent, ops: $('#ops$').textContent, lift: $('#lift$').textContent, total: $('#total$').textContent, roi: $('#roi%').textContent, breakeven: $('#breakeven').textContent }
   };
   navigator.clipboard.writeText(JSON.stringify(snap,null,2)).then(()=>{ $('#copy').textContent='Copied!'; setTimeout(()=>$('#copy').textContent='Copy Snapshot',900); });
 });
@@ -311,9 +309,9 @@ $('#copy').addEventListener('click',()=>{
 $('#csv').addEventListener('click',()=>{
   const rows=[
     ['Metric','Value'],
-    ['Fraud Savings (12m)', $('#fraud$').textContent],
+    ['Loss/Fraud Savings (12m)', $('#fraud$').textContent],
     ['Ops Savings (12m)', $('#ops$').textContent],
-    ['Approval‑Lift Margin (12m)', $('#lift$').textContent],
+    ['Lift‑Driven Margin (12m)', $('#lift$').textContent],
     ['Total Savings (12m)', $('#total$').textContent],
     ['ROI (12m)', $('#roi%').textContent],
     ['Break‑even (days)', $('#breakeven').textContent]
@@ -327,7 +325,7 @@ $('#csv').addEventListener('click',()=>{
 $$('input').forEach(i=> i.addEventListener('input', calc));
 
 // Init
-applyPreset('regional');
+applyPreset('retail');
 calc();
 </script>
 </body>

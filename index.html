@@ -71,11 +71,11 @@
       <div class="card" aria-label="Results">
         <h2>Results</h2>
         <div class="results" aria-live="polite">
-          <div class="metric"><h3>Ops Savings (12m)</h3><div id="ops$" class="value">—</div></div>
-          <div class="metric"><h3>Lift / Revenue Gain (12m)</h3><div id="lift$" class="value">—</div></div>
-          <div class="metric"><h3>Total Savings (12m)</h3><div id="total$" class="value">—</div></div>
-          <div class="metric"><h3>ROI (12m)</h3><div id="roi%" class="value">—</div><div id="roiBadge" class="badge" style="margin-top:6px">—</div></div>
-          <div class="metric"><h3>Break‑even (days)</h3><div id="breakeven" class="value">—</div></div>
+          <div class="metric"><h3>Ops Savings (12m)</h3><div id="opsVal" class="value">—</div></div>
+          <div class="metric"><h3>Lift / Revenue Gain (12m)</h3><div id="liftVal" class="value">—</div></div>
+          <div class="metric"><h3>Total Savings (12m)</h3><div id="totalVal" class="value">—</div></div>
+          <div class="metric"><h3>ROI (12m)</h3><div id="roiVal" class="value">—</div><div id="roiBadge" class="badge" style="margin-top:6px">—</div></div>
+          <div class="metric"><h3>Break‑even (days)</h3><div id="breakevenVal" class="value">—</div></div>
           <div class="metric"><h3>Assumptions</h3>
             <div id="assump" class="muted" style="font-size:13px">Using Veltrax‑wide baseline: 12% OpEx efficiency, 2.5% revenue lift converted at 45% margin; budget ≈ 0.6% of OpEx (floor $200k). Tuned during scoping.</div>
           </div>
@@ -88,13 +88,14 @@
     </div>
     <div class="teaser" role="region" aria-label="Next step">
       <div><strong>Next:</strong> Profitability Impact Explorer — model your savings, ROI, and break‑even.</div>
-      <a class="btn" href="PASTE_NEXT_URL_HERE">Open ROI Explorer</a>
+      <a class="btn" href="https://veltrax-technologies.github.io/Veltrax-Architecture/">Open ROI Explorer</a>
     </div>
 
     <footer>Illustrative modeling; refined with your data during onboarding. Veltrax tracks live ROI in‑product with immutable audit logs.</footer>
   </main>
 <script>
-  const $ = (q)=>document.querySelector(q);
+  // Shorthands and money helpers
+  const $id = (id)=>document.getElementById(id);
   const moneyFmt = (n)=> n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0});
   const numFrom = (s)=> Number((s||'').toString().replace(/[^\d.]/g,'').replace(/\.(?=.*\.)/g,'')) || 0;
   const formatInput = (el)=>{ const n=numFrom(el.value); el.value = n? n.toLocaleString() : ''; };
@@ -107,8 +108,8 @@
   const MIN_PROGRAM_COST = 200000;    // floor
 
   function calculate(){
-    const rev  = numFrom($('#rev').value);
-    const opex = numFrom($('#opex').value);
+    const rev  = numFrom($id('rev').value);
+    const opex = numFrom($id('opex').value);
 
     const opsSavings = Math.max(0, opex * OPS_SAVE_BASELINE);
     const liftGain   = Math.max(0, rev  * REVENUE_LIFT_BASELINE * GROSS_MARGIN_ASSUME);
@@ -119,31 +120,30 @@
     const daily = total/365;
     const breakeven = (daily>0) ? Math.ceil(programCost/daily) : NaN;
 
-    $('#ops$').textContent   = moneyFmt(opsSavings);
-    $('#lift$').textContent  = moneyFmt(liftGain);
-    $('#total$').textContent = moneyFmt(total);
-    $('#roi%').textContent   = isFinite(roi)? `${(roi*100).toFixed(0)}%` : '—';
-    const badge = $('#roiBadge');
+    $id('opsVal').textContent   = moneyFmt(opsSavings);
+    $id('liftVal').textContent  = moneyFmt(liftGain);
+    $id('totalVal').textContent = moneyFmt(total);
+    $id('roiVal').textContent   = isFinite(roi)? `${(roi*100).toFixed(0)}%` : '—';
+
+    const badge = $id('roiBadge');
     if(isFinite(roi)){
       badge.className = 'badge ' + (roi>1 ? 'g' : roi>0.25 ? 'y' : 'r');
       badge.textContent = roi>1 ? 'Excellent' : roi>0.25 ? 'Good' : 'Needs review';
-    }else{ badge.className='badge'; badge.textContent='—'; }
-    $('#breakeven').textContent = isFinite(breakeven) ? breakeven : '—';
+    } else { badge.className='badge'; badge.textContent='—'; }
+
+    $id('breakevenVal').textContent = isFinite(breakeven) ? breakeven : '—';
   }
 
   function bindMoneyInput(id){
-    const el = $(id);
-    // Calculate as you type (without fighting the caret)
-    el.addEventListener('input', calculate);
-    // Format with commas on blur, and re-calc
-    el.addEventListener('blur', ()=>{ formatInput(el); calculate(); });
-    // On focus, keep existing but select all for quick overwrite
+    const el = $id(id);
+    el.addEventListener('input', calculate);           // live as you type
+    el.addEventListener('blur', ()=>{ formatInput(el); calculate(); }); // pretty commas
     el.addEventListener('focus', ()=>{ setTimeout(()=> el.select(), 0); });
   }
 
-  // Init defaults (already comma-formatted in HTML)
-  bindMoneyInput('#rev');
-  bindMoneyInput('#opex');
+  // Init
+  bindMoneyInput('rev');
+  bindMoneyInput('opex');
   calculate();
 </script>
 </body>

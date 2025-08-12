@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Veltrax — Two‑Input ROI Estimator (Exec‑Simple)</title>
+<title>Veltrax — Two‑Input ROI Estimator (Low • Base • High)</title>
 <style>
   :root{ --bg:#0F1220; --text:#E6E7EB; --muted:#A9B1C3; --panel:#121832; --panel2:#0F1633; --border:#22304F; --accent:#6F42C1; --primary:#0066FF; --good:#20C997; --warn:#FFB454; --bad:#FF6B6B }
   *{box-sizing:border-box}
@@ -27,6 +27,12 @@
   .input:focus{outline:2px solid var(--primary);outline-offset:2px}
   .hint{font-size:12px;color:var(--muted)}
 
+  /* Segmented toggle */
+  .seg{display:inline-flex;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+  .seg button{border:0;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,0));color:var(--text);padding:8px 12px;cursor:pointer}
+  .seg button+button{border-left:1px solid var(--border)}
+  .seg button[aria-pressed="true"]{outline:2px solid var(--accent);outline-offset:-2px}
+
   /* Results */
   .results{display:grid;grid-template-columns:1fr;gap:12px}
   @media (min-width:720px){ .results{grid-template-columns:repeat(2,1fr)} }
@@ -47,8 +53,8 @@
 <body>
   <main class="wrap">
     <section class="card" aria-label="Intro">
-      <h1>Two‑Input ROI Estimator (Exec‑Simple)</h1>
-      <div class="muted">Enter <strong>Annual revenue</strong> and <strong>Annual operating cost</strong>. We apply Veltrax baseline impact from holistic, on‑prem AI across workflows to estimate <em>Ops Savings</em>, <em>Lift/Revenue Gain</em>, <em>Total Savings</em>, <em>ROI</em>, and <em>Break‑even days</em>. Apps then track <strong>live ROI</strong> and <strong>immutable audit logs</strong> to prove outcomes.</div>
+      <h1>Two‑Input ROI Estimator (Low • Base • High)</h1>
+      <div class="muted">Enter <strong>Annual revenue</strong> and <strong>Annual operating cost</strong>. Choose an assumption set. We estimate <em>Ops Savings</em>, <em>Lift/Revenue Gain</em>, <em>Total Savings</em>, <em>ROI</em>, and <em>Break‑even days</em>. Every Veltrax app tracks <strong>live ROI</strong> with <strong>immutable audit logs</strong>.</div>
     </section>
 
     <section class="grid" aria-label="Inputs and Results">
@@ -64,7 +70,15 @@
           <label for="opex">Annual operating cost ($)</label>
           <input id="opex" class="input money" type="text" inputmode="numeric" placeholder="12,000,000" value="12,000,000" aria-label="Annual operating cost">
         </div>
-        <div class="hint">Updates instantly as you type. No button needed.</div>
+        <div class="field">
+          <label id="assumpLbl">Assumption set</label>
+          <div class="seg" role="group" aria-labelledby="assumpLbl">
+            <button id="low"  aria-pressed="false">Low</button>
+            <button id="base" aria-pressed="true">Base</button>
+            <button id="high" aria-pressed="false">High</button>
+          </div>
+          <div class="hint" id="assumpHint"></div>
+        </div>
       </div>
 
       <!-- Results -->
@@ -76,8 +90,8 @@
           <div class="metric"><h3>Total Savings (12m)</h3><div id="totalVal" class="value">—</div></div>
           <div class="metric"><h3>ROI (12m)</h3><div id="roiVal" class="value">—</div><div id="roiBadge" class="badge" style="margin-top:6px">—</div></div>
           <div class="metric"><h3>Break‑even (days)</h3><div id="breakevenVal" class="value">—</div></div>
-          <div class="metric"><h3>Assumptions</h3>
-            <div id="assump" class="muted" style="font-size:13px">Using Veltrax‑wide baseline: 12% OpEx efficiency, 2.5% revenue lift converted at 45% margin; budget ≈ 0.6% of OpEx (floor $200k). Tuned during scoping.</div>
+          <div class="metric"><h3>Current assumptions</h3>
+            <div id="assumpText" class="muted" style="font-size:13px">—</div>
           </div>
         </div>
       </div>
@@ -94,57 +108,67 @@
     <footer>Illustrative modeling; refined with your data during onboarding. Veltrax tracks live ROI in‑product with immutable audit logs.</footer>
   </main>
 <script>
-  // Shorthands and money helpers
-  const $id = (id)=>document.getElementById(id);
-  const moneyFmt = (n)=> n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0});
+  const $ = (q)=>document.querySelector(q);
+  const money = n => n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0});
   const numFrom = (s)=> Number((s||'').toString().replace(/[^\d.]/g,'').replace(/\.(?=.*\.)/g,'')) || 0;
   const formatInput = (el)=>{ const n=numFrom(el.value); el.value = n? n.toLocaleString() : ''; };
 
-  // Baselines (conservative midpoints for holistic local AI)
-  const OPS_SAVE_BASELINE = 0.12;     // 12% OpEx efficiency
-  const REVENUE_LIFT_BASELINE = 0.025;// 2.5% revenue lift
-  const GROSS_MARGIN_ASSUME = 0.45;   // 45% gross margin converts lift to contribution
-  const PROGRAM_COST_FACTOR = 0.006;  // ~0.6% of OpEx annual budget
-  const MIN_PROGRAM_COST = 200000;    // floor
+  // Assumption sets (conservative ➜ aggressive)
+  const SETS = {
+    low:  { ops:0.10, lift:0.020, margin:0.45, budgetFactor:0.006, floor:200000 },
+    base: { ops:0.12, lift:0.025, margin:0.45, budgetFactor:0.006, floor:200000 },
+    high: { ops:0.15, lift:0.030, margin:0.50, budgetFactor:0.006, floor:200000 }
+  };
+  let CUR = SETS.base;
+
+  function describe(){
+    $('#assumpHint').textContent = `Savings=${(CUR.ops*100).toFixed(0)}% OpEx, Lift=${(CUR.lift*100).toFixed(1)}% @ ${(CUR.margin*100).toFixed(0)}% margin, Budget≈ ${(CUR.budgetFactor*100).toFixed(1)}% of OpEx (floor $${SETS.base.floor.toLocaleString()}).`;
+    $('#assumpText').textContent = $('#assumpHint').textContent;
+  }
 
   function calculate(){
-    const rev  = numFrom($id('rev').value);
-    const opex = numFrom($id('opex').value);
+    const rev  = numFrom($('#rev').value);
+    const opex = numFrom($('#opex').value);
 
-    const opsSavings = Math.max(0, opex * OPS_SAVE_BASELINE);
-    const liftGain   = Math.max(0, rev  * REVENUE_LIFT_BASELINE * GROSS_MARGIN_ASSUME);
+    const opsSavings = Math.max(0, opex * CUR.ops);
+    const liftGain   = Math.max(0, rev  * CUR.lift * CUR.margin);
     const total      = opsSavings + liftGain;
 
-    const programCost = Math.max(MIN_PROGRAM_COST, opex * PROGRAM_COST_FACTOR);
+    const programCost = Math.max(CUR.floor, opex * CUR.budgetFactor);
     const roi = (total - programCost) / programCost;
     const daily = total/365;
     const breakeven = (daily>0) ? Math.ceil(programCost/daily) : NaN;
 
-    $id('opsVal').textContent   = moneyFmt(opsSavings);
-    $id('liftVal').textContent  = moneyFmt(liftGain);
-    $id('totalVal').textContent = moneyFmt(total);
-    $id('roiVal').textContent   = isFinite(roi)? `${(roi*100).toFixed(0)}%` : '—';
+    $('#opsVal').textContent   = money(opsSavings);
+    $('#liftVal').textContent  = money(liftGain);
+    $('#totalVal').textContent = money(total);
+    $('#roiVal').textContent   = isFinite(roi)? `${(roi*100).toFixed(0)}%` : '—';
 
-    const badge = $id('roiBadge');
+    const b = $('#roiBadge');
     if(isFinite(roi)){
-      badge.className = 'badge ' + (roi>1 ? 'g' : roi>0.25 ? 'y' : 'r');
-      badge.textContent = roi>1 ? 'Excellent' : roi>0.25 ? 'Good' : 'Needs review';
-    } else { badge.className='badge'; badge.textContent='—'; }
+      b.className = 'badge ' + (roi>1 ? 'g' : roi>0.25 ? 'y' : 'r');
+      b.textContent = roi>1 ? 'Excellent' : roi>0.25 ? 'Good' : 'Needs review';
+    }else{ b.className='badge'; b.textContent='—'; }
 
-    $id('breakevenVal').textContent = isFinite(breakeven) ? breakeven : '—';
+    $('#breakevenVal').textContent = isFinite(breakeven) ? breakeven : '—';
   }
 
   function bindMoneyInput(id){
-    const el = $id(id);
-    el.addEventListener('input', calculate);           // live as you type
-    el.addEventListener('blur', ()=>{ formatInput(el); calculate(); }); // pretty commas
+    const el = $(id);
+    el.addEventListener('input', calculate);
+    el.addEventListener('blur', ()=>{ formatInput(el); calculate(); });
     el.addEventListener('focus', ()=>{ setTimeout(()=> el.select(), 0); });
   }
 
+  function pick(which){
+    ['low','base','high'].forEach(id=>{ const btn=$('#'+id); btn.setAttribute('aria-pressed', id===which ? 'true':'false'); });
+    CUR = SETS[which]; describe(); calculate();
+  }
+
   // Init
-  bindMoneyInput('rev');
-  bindMoneyInput('opex');
-  calculate();
+  ['low','base','high'].forEach(id=> $('#'+id).addEventListener('click', ()=>pick(id)));
+  bindMoneyInput('#rev'); bindMoneyInput('#opex');
+  describe(); calculate();
 </script>
 </body>
 </html>

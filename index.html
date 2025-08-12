@@ -20,15 +20,14 @@
   .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px}
   label{font-weight:700}
   .field{display:grid;gap:6px;margin-bottom:12px}
-  input[type="number"]{appearance:textfield}
-  input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button{appearance:none;margin:0}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+  /* Inputs */
   .input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0F1530;color:var(--text)}
   .input:focus{outline:2px solid var(--primary);outline-offset:2px}
-  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  .btn{border:1px solid var(--border);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,0));padding:9px 12px;border-radius:10px;color:var(--text);cursor:pointer;font-weight:700}
-  .btn.primary{background:linear-gradient(180deg,rgba(0,102,255,.25),rgba(0,102,255,.08));border-color:#1d4ed8}
-  .btn:hover{filter:brightness(1.06)}
+  .hint{font-size:12px;color:var(--muted)}
 
+  /* Results */
   .results{display:grid;grid-template-columns:1fr;gap:12px}
   @media (min-width:720px){ .results{grid-template-columns:repeat(2,1fr)} }
   @media (min-width:1024px){ .results{grid-template-columns:repeat(3,1fr)} }
@@ -58,15 +57,14 @@
         <h2>Inputs</h2>
         <div class="field">
           <label for="rev">Annual revenue ($)</label>
-          <input id="rev" class="input" type="number" inputmode="decimal" min="0" step="100000" value="50000000" aria-label="Annual revenue">
+          <input id="rev" class="input money" type="text" inputmode="numeric" placeholder="50,000,000" value="50,000,000" aria-label="Annual revenue">
+          <div class="hint">Use commas — we’ll format automatically.</div>
         </div>
         <div class="field">
           <label for="opex">Annual operating cost ($)</label>
-          <input id="opex" class="input" type="number" inputmode="decimal" min="0" step="100000" value="12000000" aria-label="Annual operating cost">
+          <input id="opex" class="input money" type="text" inputmode="numeric" placeholder="12,000,000" value="12,000,000" aria-label="Annual operating cost">
         </div>
-        <div class="row" style="margin-top:6px">
-          <button id="calcBtn" class="btn primary" aria-label="Calculate">Calculate</button>
-        </div>
+        <div class="hint">Updates instantly as you type. No button needed.</div>
       </div>
 
       <!-- Results -->
@@ -97,46 +95,56 @@
   </main>
 <script>
   const $ = (q)=>document.querySelector(q);
-  const money = n => n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0});
+  const moneyFmt = (n)=> n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0});
+  const numFrom = (s)=> Number((s||'').toString().replace(/[^\d.]/g,'').replace(/\.(?=.*\.)/g,'')) || 0;
+  const formatInput = (el)=>{ const n=numFrom(el.value); el.value = n? n.toLocaleString() : ''; };
 
-  // Baselines for holistic local AI across workflows (conservative midpoints)
-  const OPS_SAVE_BASELINE = 0.12;   // 12% OpEx efficiency (routing, assist, automation)
-  const REVENUE_LIFT_BASELINE = 0.025; // 2.5% revenue lift from better decisions/approvals/conversions
-  const GROSS_MARGIN_ASSUME = 0.45; // 45% margin turns lift into contribution dollars
-  const PROGRAM_COST_FACTOR = 0.006; // ~0.6% of OpEx as blended annual budget
-  const MIN_PROGRAM_COST = 200000;   // floor for small orgs
+  // Baselines (conservative midpoints for holistic local AI)
+  const OPS_SAVE_BASELINE = 0.12;     // 12% OpEx efficiency
+  const REVENUE_LIFT_BASELINE = 0.025;// 2.5% revenue lift
+  const GROSS_MARGIN_ASSUME = 0.45;   // 45% gross margin converts lift to contribution
+  const PROGRAM_COST_FACTOR = 0.006;  // ~0.6% of OpEx annual budget
+  const MIN_PROGRAM_COST = 200000;    // floor
 
   function calculate(){
-    const rev  = Number($('#rev').value)||0;
-    const opex = Number($('#opex').value)||0;
+    const rev  = numFrom($('#rev').value);
+    const opex = numFrom($('#opex').value);
 
     const opsSavings = Math.max(0, opex * OPS_SAVE_BASELINE);
     const liftGain   = Math.max(0, rev  * REVENUE_LIFT_BASELINE * GROSS_MARGIN_ASSUME);
     const total      = opsSavings + liftGain;
 
     const programCost = Math.max(MIN_PROGRAM_COST, opex * PROGRAM_COST_FACTOR);
-    const roi = (total - programCost) / programCost; // 12‑month ROI
+    const roi = (total - programCost) / programCost;
     const daily = total/365;
     const breakeven = (daily>0) ? Math.ceil(programCost/daily) : NaN;
 
-    $('#ops$').textContent   = money(opsSavings);
-    $('#lift$').textContent  = money(liftGain);
-    $('#total$').textContent = money(total);
-    $('#roi%').textContent   = `${(roi*100).toFixed(0)}%`;
-
-    const b = $('#roiBadge');
-    b.className = 'badge ' + (roi>1 ? 'g' : roi>0.25 ? 'y' : 'r');
-    b.textContent = roi>1 ? 'Excellent' : roi>0.25 ? 'Good' : 'Needs review';
-
+    $('#ops$').textContent   = moneyFmt(opsSavings);
+    $('#lift$').textContent  = moneyFmt(liftGain);
+    $('#total$').textContent = moneyFmt(total);
+    $('#roi%').textContent   = isFinite(roi)? `${(roi*100).toFixed(0)}%` : '—';
+    const badge = $('#roiBadge');
+    if(isFinite(roi)){
+      badge.className = 'badge ' + (roi>1 ? 'g' : roi>0.25 ? 'y' : 'r');
+      badge.textContent = roi>1 ? 'Excellent' : roi>0.25 ? 'Good' : 'Needs review';
+    }else{ badge.className='badge'; badge.textContent='—'; }
     $('#breakeven').textContent = isFinite(breakeven) ? breakeven : '—';
   }
 
-  function init(){
-    calculate();
-    $('#calcBtn').addEventListener('click', calculate);
-    ['#rev','#opex'].forEach(sel=> $(sel).addEventListener('input', calculate));
+  function bindMoneyInput(id){
+    const el = $(id);
+    // Calculate as you type (without fighting the caret)
+    el.addEventListener('input', calculate);
+    // Format with commas on blur, and re-calc
+    el.addEventListener('blur', ()=>{ formatInput(el); calculate(); });
+    // On focus, keep existing but select all for quick overwrite
+    el.addEventListener('focus', ()=>{ setTimeout(()=> el.select(), 0); });
   }
-  window.addEventListener('DOMContentLoaded', init);
+
+  // Init defaults (already comma-formatted in HTML)
+  bindMoneyInput('#rev');
+  bindMoneyInput('#opex');
+  calculate();
 </script>
 </body>
 </html>

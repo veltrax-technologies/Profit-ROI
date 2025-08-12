@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Veltrax — Two‑Input ROI Estimator</title>
+<title>Veltrax — Two‑Input ROI Estimator (Exec‑Simple)</title>
 <style>
   :root{ --bg:#0F1220; --text:#E6E7EB; --muted:#A9B1C3; --panel:#121832; --panel2:#0F1633; --border:#22304F; --accent:#6F42C1; --primary:#0066FF; --good:#20C997; --warn:#FFB454; --bad:#FF6B6B }
   *{box-sizing:border-box}
@@ -13,11 +13,11 @@
   h1{margin:0 0 8px 0;font-size:24px}
   h2{margin:0 0 10px 0}
   .muted{color:var(--muted)}
-  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px}
+
   .grid{display:grid;grid-template-columns:1fr;gap:16px}
   @media (min-width:1024px){ .grid{grid-template-columns:1fr 1fr} }
 
-  /* Inputs */
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px}
   label{font-weight:700}
   .field{display:grid;gap:6px;margin-bottom:12px}
   input[type="number"]{appearance:textfield}
@@ -29,7 +29,6 @@
   .btn.primary{background:linear-gradient(180deg,rgba(0,102,255,.25),rgba(0,102,255,.08));border-color:#1d4ed8}
   .btn:hover{filter:brightness(1.06)}
 
-  /* Results */
   .results{display:grid;grid-template-columns:1fr;gap:12px}
   @media (min-width:720px){ .results{grid-template-columns:repeat(2,1fr)} }
   @media (min-width:1024px){ .results{grid-template-columns:repeat(3,1fr)} }
@@ -41,9 +40,6 @@
   .y{background:rgba(255,180,84,.2);color:#FFE1AF;border-color:rgba(255,180,84,.45)}
   .r{background:rgba(255,107,107,.2);color:#FFC2C2;border-color:rgba(255,107,107,.45)}
 
-  .info{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid var(--border);font-weight:900;font-size:12px;color:#D7DBE6;position:relative}
-  .info[data-tip]:hover::after{content:attr(data-tip);position:absolute;left:50%;transform:translateX(-50%);bottom:130%;width:max-content;max-width:280px;background:#0b1226;color:#dfe8ff;border:1px solid #1f2b44;padding:8px 10px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.35)}
-
   .founders{margin:16px 0;border:2px solid var(--accent);background:linear-gradient(180deg,rgba(111,66,193,.12),rgba(111,66,193,.03));border-radius:14px;padding:14px}
   .teaser{margin:16px 0;border:1px dashed var(--border);border-radius:12px;padding:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:rgba(255,255,255,.03)}
   footer{color:var(--muted)}
@@ -52,8 +48,8 @@
 <body>
   <main class="wrap">
     <section class="card" aria-label="Intro">
-      <h1>Two‑Input ROI Estimator</h1>
-      <div class="muted">A 10‑second look at potential impact using Veltrax baseline assumptions. Enter <strong>Annual revenue</strong> and <strong>Annual operating cost</strong>. We estimate <em>Ops Savings</em>, <em>Lift/Revenue Gain</em>, <em>Total Savings</em>, <em>ROI</em>, and <em>Break‑even days</em>. In production, every app streams live ROI & immutable audit logs so finance and compliance can verify outcomes continuously.</div>
+      <h1>Two‑Input ROI Estimator (Exec‑Simple)</h1>
+      <div class="muted">Enter <strong>Annual revenue</strong> and <strong>Annual operating cost</strong>. We apply Veltrax baseline impact from holistic, on‑prem AI across workflows to estimate <em>Ops Savings</em>, <em>Lift/Revenue Gain</em>, <em>Total Savings</em>, <em>ROI</em>, and <em>Break‑even days</em>. Apps then track <strong>live ROI</strong> and <strong>immutable audit logs</strong> to prove outcomes.</div>
     </section>
 
     <section class="grid" aria-label="Inputs and Results">
@@ -65,12 +61,11 @@
           <input id="rev" class="input" type="number" inputmode="decimal" min="0" step="100000" value="50000000" aria-label="Annual revenue">
         </div>
         <div class="field">
-          <label for="ops">Annual operating cost ($)</label>
-          <input id="ops" class="input" type="number" inputmode="decimal" min="0" step="100000" value="12000000" aria-label="Annual operating cost">
+          <label for="opex">Annual operating cost ($)</label>
+          <input id="opex" class="input" type="number" inputmode="decimal" min="0" step="100000" value="12000000" aria-label="Annual operating cost">
         </div>
         <div class="row" style="margin-top:6px">
-          <button id="calc" class="btn primary" aria-label="Calculate">Calculate</button>
-          <span class="info" data-tip="Uses Veltrax baseline assumptions hidden under the hood (ops savings %, revenue lift %, gross margin, program budget fraction). These can be tuned during scoping to match your domain.">i</span>
+          <button id="calcBtn" class="btn primary" aria-label="Calculate">Calculate</button>
         </div>
       </div>
 
@@ -81,10 +76,10 @@
           <div class="metric"><h3>Ops Savings (12m)</h3><div id="ops$" class="value">—</div></div>
           <div class="metric"><h3>Lift / Revenue Gain (12m)</h3><div id="lift$" class="value">—</div></div>
           <div class="metric"><h3>Total Savings (12m)</h3><div id="total$" class="value">—</div></div>
-          <div class="metric"><h3>ROI (12m)</h3><div class="value" id="roi%">—</div><div id="roiBadge" class="badge" style="margin-top:6px">—</div></div>
+          <div class="metric"><h3>ROI (12m)</h3><div id="roi%" class="value">—</div><div id="roiBadge" class="badge" style="margin-top:6px">—</div></div>
           <div class="metric"><h3>Break‑even (days)</h3><div id="breakeven" class="value">—</div></div>
           <div class="metric"><h3>Assumptions</h3>
-            <div id="assump" class="muted" style="font-size:13px">—</div>
+            <div id="assump" class="muted" style="font-size:13px">Using Veltrax‑wide baseline: 12% OpEx efficiency, 2.5% revenue lift converted at 45% margin; budget ≈ 0.6% of OpEx (floor $200k). Tuned during scoping.</div>
           </div>
         </div>
       </div>
@@ -104,47 +99,44 @@
   const $ = (q)=>document.querySelector(q);
   const money = n => n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0});
 
-  // ─────────────────────────────────────────────
-  // "Under the hood" baselines — easy to tune
-  // ─────────────────────────────────────────────
-  const OPS_SAVE_BASELINE = 0.08;     // 8% reduction of operating cost
-  const REVENUE_LIFT_BASELINE = 0.015;// 1.5% revenue lift
-  const GROSS_MARGIN_ASSUME = 0.40;   // 40% gross margin -> turn lift into margin dollars
-  const PROGRAM_COST_FACTOR = 0.0065; // ~0.65% of operating cost (blended license+infra) — illustrative
-  const MIN_PROGRAM_COST = 200000;    // floor so very small orgs still see realistic payback
+  // Baselines for holistic local AI across workflows (conservative midpoints)
+  const OPS_SAVE_BASELINE = 0.12;   // 12% OpEx efficiency (routing, assist, automation)
+  const REVENUE_LIFT_BASELINE = 0.025; // 2.5% revenue lift from better decisions/approvals/conversions
+  const GROSS_MARGIN_ASSUME = 0.45; // 45% margin turns lift into contribution dollars
+  const PROGRAM_COST_FACTOR = 0.006; // ~0.6% of OpEx as blended annual budget
+  const MIN_PROGRAM_COST = 200000;   // floor for small orgs
 
-  function calc(){
-    const rev = Number($('#rev').value)||0;
-    const ops = Number($('#ops').value)||0;
+  function calculate(){
+    const rev  = Number($('#rev').value)||0;
+    const opex = Number($('#opex').value)||0;
 
-    const opsSavings = Math.max(0, ops * OPS_SAVE_BASELINE);
-    const liftGain   = Math.max(0, rev * REVENUE_LIFT_BASELINE * GROSS_MARGIN_ASSUME);
+    const opsSavings = Math.max(0, opex * OPS_SAVE_BASELINE);
+    const liftGain   = Math.max(0, rev  * REVENUE_LIFT_BASELINE * GROSS_MARGIN_ASSUME);
     const total      = opsSavings + liftGain;
 
-    const programCost = Math.max(MIN_PROGRAM_COST, ops * PROGRAM_COST_FACTOR);
-    const roi = (total - programCost) / programCost;
+    const programCost = Math.max(MIN_PROGRAM_COST, opex * PROGRAM_COST_FACTOR);
+    const roi = (total - programCost) / programCost; // 12‑month ROI
     const daily = total/365;
-    const breakeven = daily>0 ? Math.ceil(programCost/daily) : NaN;
+    const breakeven = (daily>0) ? Math.ceil(programCost/daily) : NaN;
 
-    // UI
     $('#ops$').textContent   = money(opsSavings);
     $('#lift$').textContent  = money(liftGain);
     $('#total$').textContent = money(total);
     $('#roi%').textContent   = `${(roi*100).toFixed(0)}%`;
-    const badge = $('#roiBadge');
-    badge.className = 'badge ' + (roi>1 ? 'g' : roi>0.25 ? 'y' : 'r');
-    badge.textContent = roi>1 ? 'Excellent' : roi>0.25 ? 'Good' : 'Needs review';
-    $('#breakeven').textContent = isFinite(breakeven) ? breakeven : '—';
 
-    $('#assump').textContent = `Using ${Math.round(OPS_SAVE_BASELINE*100)}% ops savings, ${Math.round(REVENUE_LIFT_BASELINE*100)}% revenue lift @ ${(GROSS_MARGIN_ASSUME*100).toFixed(0)}% margin; program budget ≈ ${(PROGRAM_COST_FACTOR*100).toFixed(2)}% of OpEx (min ${money(MIN_PROGRAM_COST)}).`;
+    const b = $('#roiBadge');
+    b.className = 'badge ' + (roi>1 ? 'g' : roi>0.25 ? 'y' : 'r');
+    b.textContent = roi>1 ? 'Excellent' : roi>0.25 ? 'Good' : 'Needs review';
+
+    $('#breakeven').textContent = isFinite(breakeven) ? breakeven : '—';
   }
 
-  // Interactions
-  $('#calc').addEventListener('click', calc);
-  document.querySelectorAll('input').forEach(i=> i.addEventListener('input', calc));
-
-  // Init
-  calc();
+  function init(){
+    calculate();
+    $('#calcBtn').addEventListener('click', calculate);
+    ['#rev','#opex'].forEach(sel=> $(sel).addEventListener('input', calculate));
+  }
+  window.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>

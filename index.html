@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Veltrax — ROI & Savings Estimator (Board-Ready)</title>
+<title>Veltrax — ROI & Savings Estimator (Executive View)</title>
 <style>
   :root{
     --bg:#0F1220; --surface:#151A2F; --panel:#0F1220; --muted:#A7ABBA; --text:#E6E7EB;
@@ -36,10 +36,6 @@
   @media(min-width:1180px){.results{grid-template-columns:repeat(3,1fr)}}
   .metric{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:14px}
   .metric .k{font-size:28px;font-weight:800}
-  .badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-size:12px;border:1px solid var(--border);background:#101529;color:var(--muted)}
-  .b-ok{color:#d6ffe9;background:rgba(22,199,132,.14);border-color:rgba(22,199,132,.35)}
-  .b-warn{color:#2b2200;background:rgba(255,193,58,.25);border-color:rgba(255,193,58,.5)}
-  .b-danger{color:#fff;background:rgba(255,59,48,.18);border-color:rgba(255,59,48,.45)}
 
   details.calc{margin-top:12px;border:1px dashed var(--border);border-radius:12px;background:rgba(255,255,255,.03)}
   details.calc summary{cursor:pointer;padding:10px 12px;font-weight:700}
@@ -53,6 +49,10 @@
   .founders{margin-top:16px;border:2px solid var(--accent);background:linear-gradient(180deg,rgba(111,66,193,.12),rgba(111,66,193,.03));border-radius:14px;padding:14px}
   .teaser{margin:16px 0;border:1px dashed var(--border);border-radius:12px;padding:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:rgba(255,255,255,.03)}
   .note{color:var(--muted);font-size:12px}
+
+  /* Executive bullets */
+  .bullets{margin:8px 0 0 0;padding-left:18px;color:var(--muted)}
+  .bullets li{margin:6px 0}
 </style>
 </head>
 <body>
@@ -176,8 +176,20 @@
             <div class="metric"><div>Break‑even (days)</div><div class="k" id="outBE">–</div></div>
           </div>
 
-          <details class="calc" style="margin-top:12px">
-            <summary>How we calculate (board‑ready)</summary>
+          <!-- Executive explainer (non-numeric, product-specific) -->
+          <details class="calc" open>
+            <summary>Why these gains happen (executive explainer)</summary>
+            <div class="calc-body">
+              <ul id="explainBullets" class="bullets"></ul>
+              <p class="note" style="margin-top:8px">
+                Delivered on‑prem via local LLMs and ML models; no third‑party data exposure.
+              </p>
+            </div>
+          </details>
+
+          <!-- Optional math drawer for boards/auditors -->
+          <details class="calc">
+            <summary>How we calculate (optional)</summary>
             <div class="calc-body">
               <div class="code" id="explain"></div>
             </div>
@@ -202,7 +214,7 @@
   </div>
 
 <script>
-/* ── 1) Product presets & assumption sets ───────────────────────────────── */
+/* ── 1) Product presets & assumption sets ──────────────────────────────── */
 const PRESETS = {
   finex: { // Finance
     low:  { revLift:5,  margin:45, opexSave:12, fraudReduce:15 },
@@ -230,7 +242,43 @@ function applyPreset(product, tier){
   if(p.fraudReduce!==undefined) document.getElementById('a_fraudReduce').value = p.fraudReduce;
 }
 
-/* ── 2) Helpers ─────────────────────────────────────────────────────────── */
+/* ── 2) Executive explainer copy (product-specific) ────────────────────── */
+const WHY = {
+  finex: [
+    "Fraud prevention ROI is massive. Even a 1–2% detection lift or false‑positive reduction can translate into millions in retained revenue; Finex does both by escalating only edge cases to the LLM.",
+    "Loan approval optimization unlocks revenue. Increasing approvals at the same (or lower) risk profile directly grows top‑line while holding losses flat.",
+    "Cloud vendor savings. Moving from external AI APIs to local inference eliminates recurring per‑call fees and egress—often 6–7 figures at volume.",
+    "Staff efficiency. Reduce manual fraud review and underwriting minutes; redeploy capacity to higher‑value work without prescribing headcount cuts."
+  ],
+  echelon: [
+    "Unified retail intelligence. Link POS, inventory, promos, and labor to expose shrink and leakage in real time.",
+    "Promo/pricing lift. Optimize offer timing and mix at a store or segment level; the LLM turns signals into next‑best actions.",
+    "Cloud consolidation. Replace overlapping analytics/ETL tools with on‑prem inference and RAG.",
+    "Fewer handoffs. Queue shaping and case triage remove operational friction across stores and DCs."
+  ],
+  verdict: [
+    "Time‑to‑argument. Local LLMs compress research, discovery search, and drafting cycles without sending matters to a third party.",
+    "Reusable knowledge. RAG over your brief bank and prior matters increases consistency and quality.",
+    "Vendor reduction. Cut external research platform overuse by answering common queries locally.",
+    "Throughput gains. Partners and associates spend less time hunting, more time deciding."
+  ],
+  healthcare: [
+    "Revenue cycle acceleration. Surface denial risks earlier; cut rework and resubmits.",
+    "Scheduling & utilization. Match staffing and capacity to live demand patterns.",
+    "On‑prem privacy. PHI stays local while LLMs summarize, route, and explain recommendations.",
+    "Vendor consolidation. Replace fragmented analytics with one secure platform."
+  ]
+};
+
+function renderWhy(product){
+  const list = document.getElementById('explainBullets');
+  if(!list) return;
+  const key = (product==='finex' || product==='echelon' || product==='verdict') ? product : 'finex';
+  const items = WHY[key] || [];
+  list.innerHTML = items.map(t=> `<li>${t}</li>`).join('');
+}
+
+/* ── 3) Helpers ────────────────────────────────────────────────────────── */
 const $ = (id)=>document.getElementById(id);
 const usd = (n)=> n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0});
 const pct = (n)=> `${(+n).toFixed(1)}%`;
@@ -239,15 +287,15 @@ function setPillActive(target){
   target.classList.add('active');
 }
 
-/* ── 3) UI wiring for product/industry behaviour ────────────────────────── */
+/* ── 4) UI wiring for product/industry behaviour ───────────────────────── */
 function syncVisibility(){
   const prod = $('product').value;
   $('metricFraud').style.display = (prod==='finex') ? 'block' : 'none';
   $('fraudWrap').style.display = (prod==='finex') ? 'block' : 'none';
+  renderWhy(prod);
 }
 $('industry').addEventListener('change', ()=>{
   const ind = $('industry').value;
-  // Simple mapping: pick sensible default product
   const map = {finance:'finex', retail:'echelon', legal:'verdict', healthcare:'echelon'};
   $('product').value = map[ind] || 'finex';
   syncVisibility();
@@ -265,13 +313,12 @@ document.querySelectorAll('.pill[data-load]').forEach(el=>{
     const prod = e.currentTarget.dataset.load;
     $('product').value = prod;
     syncVisibility();
-    // keep existing preset selection
     const act = document.querySelector('.pill[data-preset].active')?.dataset.preset || 'base';
     applyPreset(prod, act);
   });
 });
 
-/* ── 4) Core calculation ───────────────────────────────────────────────── */
+/* ── 5) Core calculation ──────────────────────────────────────────────── */
 function calculate(){
   const prod = $('product').value;
 
@@ -286,17 +333,15 @@ function calculate(){
   const opexSavePct  = +$('a_opexSave').value/100;
   const fraudRedPct  = +$('a_fraudReduce').value/100;
 
-  // Components
-  const opexSavings = opex * opexSavePct;                         // OpEx saved
-  const revLift     = revenue * revLiftPct * marginPct;           // revenue lift × gross margin
+  const opexSavings = opex * opexSavePct;
+  const revLift     = revenue * revLiftPct * marginPct;
   const fraudSavings= (prod==='finex') ? (fraud * fraudRedPct) : 0;
-  const vendorSavings = vendor;                                   // full vendor displacement
+  const vendorSavings = vendor;
   const total = opexSavings + revLift + fraudSavings + vendorSavings;
 
   const roi = (budget>0) ? ((total - budget)/budget*100) : 0;
   const breakevenDays = (total>0 && budget>0) ? Math.max(1, Math.round(365 * (budget/total))) : 0;
 
-  // Render
   $('outOpEx').textContent  = usd(opexSavings);
   $('outLift').textContent  = usd(revLift);
   $('outFraud').textContent = usd(fraudSavings);
@@ -305,7 +350,6 @@ function calculate(){
   $('outROI').textContent   = `${Math.round(roi).toLocaleString()}%`;
   $('outBE').textContent    = breakevenDays.toLocaleString();
 
-  // Explainer
   $('explain').textContent =
 `Inputs
   Revenue: ${usd(revenue)}
@@ -327,14 +371,17 @@ Formulas
   Total Savings    = sum(components)                = ${usd(total)}
   ROI (12m)        = (Total − Budget) ÷ Budget      = ${usd(total)} − ${usd(budget)} ÷ ${usd(budget)} = ${Math.round(roi).toLocaleString()}%
   Break‑even days  = 365 × (Budget ÷ Total)         = 365 × (${usd(budget)} ÷ ${usd(total)}) ≈ ${breakevenDays} day(s)`;
+
+  renderWhy(prod);
 }
 
 $('btnCalc').addEventListener('click', calculate);
 
-/* ── 5) Initialize ─────────────────────────────────────────────────────── */
+/* ── 6) Initialize ────────────────────────────────────────────────────── */
 syncVisibility();
-applyPreset('finex','low'); // default selection aligns with visible pills
+applyPreset('finex','low'); // align with default pill
 calculate();
+renderWhy(document.getElementById('product').value);
 </script>
 </body>
 </html>

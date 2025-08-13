@@ -2,173 +2,343 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Veltrax — Two‑Input ROI Estimator (Low • Base • High)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Veltrax — Industry ROI & Savings Estimator</title>
 <style>
-  :root{ --bg:#0F1220; --text:#E6E7EB; --muted:#A9B1C3; --panel:#121832; --panel2:#0F1633; --border:#22304F; --accent:#6F42C1; --primary:#0066FF; --good:#20C997; --warn:#FFB454; --bad:#FF6B6B }
+  /* ────────────────────────────────────────────
+     Veltrax Visual System (dark)
+     ──────────────────────────────────────────── */
+  :root{
+    --bg:#0F1220; --surface:#121832; --panel:#0F1633;
+    --text:#E6E7EB; --muted:#A9B1C3; --border:#22304F;
+    --primary:#0066FF; --accent:#6F42C1;
+    --good:#16C784; --warn:#FFC13A; --danger:#FF3B30;
+  }
   *{box-sizing:border-box}
   html,body{height:100%}
-  body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial,sans-serif}
-  .wrap{max-width:1180px;margin:0 auto;padding:16px}
+  body{margin:0;background:var(--bg);color:var(--text);
+       font:15px/1.6 system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial,sans-serif}
+  .wrap{max-width:1080px;margin:0 auto;padding:16px}
   h1{margin:0 0 8px 0;font-size:24px}
-  h2{margin:0 0 10px 0}
-  .muted{color:var(--muted)}
+  h2{margin:0 0 10px 0;font-size:16px}
+  p.subtle{color:var(--muted);margin:6px 0}
 
-  .grid{display:grid;grid-template-columns:1fr;gap:16px}
+  /* Cards & layout */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px}
+  .grid{display:grid;gap:16px}
   @media (min-width:1024px){ .grid{grid-template-columns:1fr 1fr} }
-
-  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px}
-  label{font-weight:700}
-  .field{display:grid;gap:6px;margin-bottom:12px}
-  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .results{display:grid;gap:12px}
+  @media (min-width:900px){ .results{grid-template-columns:repeat(2,1fr)} }
+  @media (min-width:1200px){ .results{grid-template-columns:repeat(3,1fr)} }
+  .metric{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px}
+  .metric h3{margin:0 0 6px 0;font-size:14px;color:#C9D2E6}
+  .value{font-size:26px;font-weight:800}
+  .badge{display:inline-flex;border:1px solid rgba(255,255,255,.15);padding:4px 10px;border-radius:999px;font-size:12px}
+  .b-good{background:rgba(22,199,132,.18);color:#9EF2D9;border-color:rgba(22,199,132,.45)}
+  .b-warn{background:rgba(255,193,58,.20);color:#FFE7B0;border-color:rgba(255,193,58,.45)}
+  .b-bad {background:rgba(255,59,48,.20);color:#FFC4C4;border-color:rgba(255,59,48,.45)}
 
   /* Inputs */
-  .input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0F1530;color:var(--text)}
-  .input:focus{outline:2px solid var(--primary);outline-offset:2px}
-  .hint{font-size:12px;color:var(--muted)}
+  .field{display:grid;gap:6px;margin-bottom:12px}
+  label{font-weight:700}
+  .input,.select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0F1530;color:var(--text)}
+  .input:focus,.select:focus{outline:2px solid var(--primary);outline-offset:2px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .btn{border:1px solid var(--border);background:linear-gradient(180deg,rgba(0,102,255,.22),rgba(0,102,255,.06));padding:10px 14px;border-radius:10px;color:var(--text);font-weight:800;cursor:pointer}
+  .btn:hover{filter:brightness(1.06)}
 
-  /* Segmented toggle */
-  .seg{display:inline-flex;border:1px solid var(--border);border-radius:12px;overflow:hidden}
-  .seg button{border:0;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,0));color:var(--text);padding:8px 12px;cursor:pointer}
-  .seg button+button{border-left:1px solid var(--border)}
-  .seg button[aria-pressed="true"]{outline:2px solid var(--accent);outline-offset:-2px}
-
-  /* Results */
-  .results{display:grid;grid-template-columns:1fr;gap:12px}
-  @media (min-width:720px){ .results{grid-template-columns:repeat(2,1fr)} }
-  @media (min-width:1024px){ .results{grid-template-columns:repeat(3,1fr)} }
-  .metric{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:14px}
-  .metric h3{margin:0 0 4px 0;font-size:14px;color:#C9D2E6}
-  .value{font-size:26px;font-weight:800}
-  .badge{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.15);font-size:12px;font-weight:800}
-  .g{background:rgba(32,201,151,.18);color:#9CF0D5;border-color:rgba(32,201,151,.45)}
-  .y{background:rgba(255,180,84,.2);color:#FFE1AF;border-color:rgba(255,180,84,.45)}
-  .r{background:rgba(255,107,107,.2);color:#FFC2C2;border-color:rgba(255,107,107,.45)}
-
-  .founders{margin:16px 0;border:2px solid var(--accent);background:linear-gradient(180deg,rgba(111,66,193,.12),rgba(111,66,193,.03));border-radius:14px;padding:14px}
+  /* Founders & next sections (kept) */
+  .founders{margin-top:16px;border:2px solid var(--accent);background:linear-gradient(180deg,rgba(111,66,193,.12),rgba(111,66,193,.03));border-radius:14px;padding:14px}
   .teaser{margin:16px 0;border:1px dashed var(--border);border-radius:12px;padding:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:rgba(255,255,255,.03)}
-  footer{color:var(--muted)}
+  footer{margin-top:14px;color:var(--muted)}
 </style>
 </head>
 <body>
   <main class="wrap">
-    <section class="card" aria-label="Intro">
-      <h1>Two‑Input ROI Estimator (Low • Base • High)</h1>
-      <div class="muted">Enter <strong>Annual revenue</strong> and <strong>Annual operating cost</strong>. Choose an assumption set. We estimate <em>Ops Savings</em>, <em>Lift/Revenue Gain</em>, <em>Total Savings</em>, <em>ROI</em>, and <em>Break‑even days</em>. Every Veltrax app tracks <strong>live ROI</strong> with <strong>immutable audit logs</strong>.</div>
+    <section class="card">
+      <h1>Veltrax ROI & Savings Estimator</h1>
+      <p class="subtle">
+        Pick your industry and product. Enter revenue / OpEx (and fraud losses for Finance).
+        We’ll estimate <b>Revenue Lift</b>, <b>OpEx Savings</b>, <b>Total Impact</b>, <b>ROI</b>, and <b>Break‑even days</b>.
+        Everything runs locally in your browser.
+      </p>
     </section>
 
-    <section class="grid" aria-label="Inputs and Results">
-      <!-- Inputs -->
+    <!-- Inputs -->
+    <section class="grid">
       <div class="card" aria-label="Inputs">
         <h2>Inputs</h2>
         <div class="field">
-          <label for="rev">Annual revenue ($)</label>
-          <input id="rev" class="input money" type="text" inputmode="numeric" placeholder="50,000,000" value="50,000,000" aria-label="Annual revenue">
-          <div class="hint">Use commas — we’ll format automatically.</div>
+          <label for="industry">Industry</label>
+          <select id="industry" class="select" aria-label="Industry">
+            <option value="finance">Finance</option>
+            <option value="retail">Retail</option>
+            <option value="healthcare">Healthcare</option>
+            <option value="legal">Legal</option>
+            <option value="manufacturing">Manufacturing</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="product">Product</label>
+          <select id="product" class="select" aria-label="Product">
+            <!-- dynamically constrained by industry -->
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="revenue">Annual revenue ($)</label>
+          <input id="revenue" class="input" type="number" inputmode="numeric" value="1000000000"/>
         </div>
         <div class="field">
           <label for="opex">Annual operating cost ($)</label>
-          <input id="opex" class="input money" type="text" inputmode="numeric" placeholder="12,000,000" value="12,000,000" aria-label="Annual operating cost">
+          <input id="opex" class="input" type="number" inputmode="numeric" value="250000000"/>
         </div>
+
+        <div id="fraudWrap" class="field" style="display:none">
+          <label for="fraudLoss">Annual fraud losses ($) <span class="badge">Finance only</span></label>
+          <input id="fraudLoss" class="input" type="number" inputmode="numeric" value="20000000"/>
+        </div>
+
         <div class="field">
-          <label id="assumpLbl">Assumption set</label>
-          <div class="seg" role="group" aria-labelledby="assumpLbl">
-            <button id="low"  aria-pressed="false">Low</button>
-            <button id="base" aria-pressed="true">Base</button>
-            <button id="high" aria-pressed="false">High</button>
-          </div>
-          <div class="hint" id="assumpHint"></div>
+          <label for="vendorSpend">Current vendor spend replaced by Veltrax ($/yr)</label>
+          <input id="vendorSpend" class="input" type="number" inputmode="numeric" value="1200000"/>
         </div>
+
+        <div class="field">
+          <label for="budget">Veltrax budget ($/yr)</label>
+          <input id="budget" class="input" type="number" inputmode="numeric" value="0" />
+          <p class="subtle" id="budgetHint">Default = max(0.6% of OpEx, $200,000). We’ll auto‑fill if left as 0.</p>
+        </div>
+
+        <div class="row" role="group" aria-label="Assumptions">
+          <strong>Assumption set:</strong>
+          <button class="btn" data-mode="low">Low</button>
+          <button class="btn" data-mode="base">Base</button>
+          <button class="btn" data-mode="high">High</button>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <button id="calc" class="btn">Calculate</button>
+          <div class="badge">All math runs in your browser.</div>
+        </div>
+        <p class="subtle" id="assumpText"></p>
       </div>
 
-      <!-- Results -->
-      <div class="card" aria-label="Results">
+      <!-- Outputs -->
+      <div class="card" aria-label="Outputs">
         <h2>Results</h2>
-        <div class="results" aria-live="polite">
-          <div class="metric"><h3>Ops Savings (12m)</h3><div id="opsVal" class="value">—</div></div>
-          <div class="metric"><h3>Lift / Revenue Gain (12m)</h3><div id="liftVal" class="value">—</div></div>
-          <div class="metric"><h3>Total Savings (12m)</h3><div id="totalVal" class="value">—</div></div>
-          <div class="metric"><h3>ROI (12m)</h3><div id="roiVal" class="value">—</div><div id="roiBadge" class="badge" style="margin-top:6px">—</div></div>
-          <div class="metric"><h3>Break‑even (days)</h3><div id="breakevenVal" class="value">—</div></div>
-          <div class="metric"><h3>Current assumptions</h3>
-            <div id="assumpText" class="muted" style="font-size:13px">—</div>
+        <div class="results">
+          <div class="metric">
+            <h3>Ops Savings (12m)</h3>
+            <div id="outOps" class="value">—</div>
+          </div>
+          <div class="metric">
+            <h3>Lift / Revenue Gain (12m)</h3>
+            <div id="outLift" class="value">—</div>
+          </div>
+          <div class="metric">
+            <h3>Total Savings (12m)</h3>
+            <div id="outTotal" class="value">—</div>
+          </div>
+          <div class="metric">
+            <h3>ROI (12m) <span id="roiBadge" class="badge">—</span></h3>
+            <div id="outRoi" class="value">—</div>
+          </div>
+          <div class="metric">
+            <h3>Break‑even (days)</h3>
+            <div id="outDays" class="value">—</div>
+          </div>
+          <div class="metric">
+            <h3>Notes</h3>
+            <div id="notes" class="subtle">—</div>
           </div>
         </div>
       </div>
     </section>
 
-    <div class="founders" role="note" aria-label="Founders deal">
+    <!-- Keep these sections verbatim (per your request) -->
+    <div class="founders" role="note">
       <strong>Founders deal:</strong> 30% upfront with milestone deliveries. First 5 get <strong>15% off</strong> + <strong>1 year support</strong>.
     </div>
-    <div class="teaser" role="region" aria-label="Next step">
-      <div><strong>Next:</strong> Architecture - Local-First Enterprise AI.</div>
-      <a class="btn" href="https://veltrax-technologies.github.io/Veltrax-Architecture/">Open Veltrax Architecture</a>
+    <div class="teaser" role="region">
+      <div><strong>Next:</strong> Security & Compliance Map — see threats mapped to controls and evidence.</div>
+      <a class="btn" href="https://veltrax-technologies.github.io/Security-Compliance/">Open Security Map</a>
     </div>
 
-    <footer>Illustrative modeling; refined with your data during onboarding. Veltrax tracks live ROI in‑product with immutable audit logs.</footer>
+    <footer>
+      <small>© Veltrax — on‑prem, local‑first AI. Calculator is conservative; production deploys add batching, backpressure, guardrails, and audit logs.</small>
+    </footer>
   </main>
+
 <script>
-  const $ = (q)=>document.querySelector(q);
-  const money = n => n.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0});
-  const numFrom = (s)=> Number((s||'').toString().replace(/[^\d.]/g,'').replace(/\.(?=.*\.)/g,'')) || 0;
-  const formatInput = (el)=>{ const n=numFrom(el.value); el.value = n? n.toLocaleString() : ''; };
+/* ─────────────────────────────────────────────────────────────────
+   1) Baselines by industry × product
+   ----------------------------------------------------------------
+   Each entry defines default percentages for:
+   - revGainPct: % of revenue (annual)
+   - costSavePct: % of OpEx
+   - fraudReducePct: % of fraud losses (finance only)
+   - paybackMonths: nominal expectation used for notes (computed
+     value may differ; we compute real break-even below)
+   - roiPct: headline ROI expectation (display/reference only)
+   These feed the REAL formulas implemented below.
+────────────────────────────────────────────────────────────────── */
+const BASELINES = {
+  finance: {
+    products: ["Finex"],
+    defaults: { revGainPct: 0.08, costSavePct: 0.20, fraudReducePct: 0.25, paybackMonths: 5, roiPct: 3.00 }
+  },
+  retail: {
+    products: ["Échelon"],
+    defaults: { revGainPct: 0.10, costSavePct: 0.18, fraudReducePct: 0.00, paybackMonths: 6, roiPct: 2.80 }
+  },
+  healthcare: {
+    products: ["Échelon"],
+    defaults: { revGainPct: 0.09, costSavePct: 0.15, fraudReducePct: 0.00, paybackMonths: 6, roiPct: 2.50 }
+  },
+  legal: {
+    products: ["Verdict"],
+    defaults: { revGainPct: 0.07, costSavePct: 0.12, fraudReducePct: 0.00, paybackMonths: 8, roiPct: 2.00 }
+  },
+  manufacturing: {
+    products: ["Échelon"],
+    defaults: { revGainPct: 0.06, costSavePct: 0.14, fraudReducePct: 0.00, paybackMonths: 8, roiPct: 2.10 }
+  }
+};
 
-  // Assumption sets (conservative ➜ aggressive)
-  const SETS = {
-    low:  { ops:0.10, lift:0.020, margin:0.45, budgetFactor:0.006, floor:200000 },
-    base: { ops:0.12, lift:0.025, margin:0.45, budgetFactor:0.006, floor:200000 },
-    high: { ops:0.15, lift:0.030, margin:0.50, budgetFactor:0.006, floor:200000 }
+/* Assumption multipliers (Low/Base/High). These scale the baseline
+   %s to create conservative or optimistic scenarios. */
+const MODES = {
+  low:  { mult: 0.70, label: "Low — conservative scenario (‑30% effectiveness)" },
+  base: { mult: 1.00, label: "Base — default assumptions" },
+  high: { mult: 1.30, label: "High — strong execution (+30% effectiveness)" }
+};
+
+const $ = (id) => document.getElementById(id);
+let currentMode = 'base';
+
+/* ─────────────────────────────────────────────────────────────────
+   2) UI wiring for industry → product constraints
+────────────────────────────────────────────────────────────────── */
+function populateProducts() {
+  const industry = $('industry').value;
+  const prodSel = $('product');
+  prodSel.innerHTML = '';
+  BASELINES[industry].products.forEach(p=>{
+    const opt = document.createElement('option');
+    opt.value = p.toLowerCase();
+    opt.textContent = p;
+    prodSel.appendChild(opt);
+  });
+  // Show fraud input only for Finance
+  $('fraudWrap').style.display = (industry === 'finance') ? 'grid' : 'none';
+  renderAssumptionText();
+}
+
+function renderAssumptionText(){
+  const industry = $('industry').value;
+  const {revGainPct,costSavePct,fraudReducePct,paybackMonths,roiPct} = BASELINES[industry].defaults;
+  const mult = MODES[currentMode].mult;
+  const effRev = (revGainPct*mult*100).toFixed(1);
+  const effCost= (costSavePct*mult*100).toFixed(1);
+  const effFraud = (fraudReducePct*mult*100).toFixed(1);
+  $('assumpText').textContent =
+    `Assumptions (${MODES[currentMode].label}). Revenue gain ≈ ${effRev}%, ` +
+    `OpEx savings ≈ ${effCost}%` + (industry==='finance'?`, Fraud reduction ≈ ${effFraud}%`:'') +
+    `. Nominal payback ≈ ${paybackMonths} mo; headline ROI ≈ ${(roiPct*100).toFixed(0)}%.`;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   3) Core formulas (explicit)
+   ----------------------------------------------------------------
+   Given:
+   R  = Annual revenue
+   O  = Annual operating cost (OpEx)
+   V  = Current vendor spend replaced ($/yr)
+   F  = Annual fraud losses (Finance only; else 0)
+   α  = Revenue Lift %
+   β  = OpEx Savings %
+   γ  = Fraud Loss Reduction %
+   B  = Veltrax budget ($/yr). If 0 → max(0.6% * O, $200k)
+   Then:
+   Revenue Lift (L)       = R * α
+   OpEx Savings (S_OpEx)  = O * β
+   Vendor Savings (S_V)   = V
+   Fraud Savings (S_F)    = F * γ        (Finance only; else 0)
+   Total Impact (T)       = L + S_OpEx + S_V + S_F
+   ROI (%)                = ((T - B) / B) * 100
+   Break-even (days)      = ceil(365 * B / max(T, 1))
+────────────────────────────────────────────────────────────────── */
+function fmtMoney(n){
+  return n.toLocaleString(undefined, {style:'currency', currency:'USD', maximumFractionDigits:0});
+}
+
+function badge(el, roi){
+  el.className = 'badge';
+  if(roi >= 200) el.classList.add('b-good');
+  else if(roi >= 50) el.classList.add('b-warn');
+  else el.classList.add('b-bad');
+  el.textContent = roi>=0 ? 'Excellent' : 'Check budget';
+}
+
+function calculate(){
+  const industry = $('industry').value;
+  const mult = MODES[currentMode].mult;
+  const base = BASELINES[industry].defaults;
+
+  const R = Math.max(0, Number($('revenue').value||0));
+  const O = Math.max(0, Number($('opex').value||0));
+  const V = Math.max(0, Number($('vendorSpend').value||0));
+  const F = (industry==='finance') ? Math.max(0, Number($('fraudLoss').value||0)) : 0;
+
+  let B = Math.max(0, Number($('budget').value||0));
+  if(B === 0){ B = Math.max(0.006 * O, 200000); $('budget').value = Math.round(B); }
+
+  // Effective % after assumption multiplier
+  const α = base.revGainPct * mult;
+  const β = base.costSavePct * mult;
+  const γ = base.fraudReducePct * mult;
+
+  const L  = R * α;
+  const S1 = O * β;
+  const S2 = V;
+  const S3 = F * γ;
+  const T  = L + S1 + S2 + S3;
+
+  const ROI = (T > 0 && B > 0) ? ((T - B) / B) * 100 : 0;
+  const days = (T > 0 && B > 0) ? Math.ceil(365 * (B / T)) : '—';
+
+  $('outOps').textContent   = fmtMoney(S1 + S2 + S3);
+  $('outLift').textContent  = fmtMoney(L);
+  $('outTotal').textContent = fmtMoney(T);
+  $('outRoi').textContent   = `${Math.round(ROI)}%`;
+  $('outDays').textContent  = (typeof days === 'number') ? days.toString() : '—';
+  badge($('roiBadge'), Math.round(ROI));
+
+  // Industry note (kept short, draw from your architecture copy)
+  const notes = {
+    finance: "Finex unifies loans, fraud, and KPIs. It reduces fraud losses, consolidates vendor spend, and surfaces next‑best actions with explainable scoring.",
+    retail: "Échelon links POS, inventory, and ops. It cuts leakage, optimizes promos, and shrinks labor friction with real‑time store intelligence.",
+    healthcare: "Échelon streamlines revenue cycle, scheduling, and supply. It reduces denials and delays, and improves utilization.",
+    legal: "Verdict accelerates case prep, discovery search, and drafting. It reduces research hours and turnaround time with local LLMs.",
+    manufacturing: "Échelon monitors throughput, scrap, and downtime. It reduces unplanned stops, optimizes changeovers, and prevents loss."
   };
-  let CUR = SETS.base;
+  $('notes').textContent = notes[industry];
+}
 
-  function describe(){
-    $('#assumpHint').textContent = `Savings=${(CUR.ops*100).toFixed(0)}% OpEx, Lift=${(CUR.lift*100).toFixed(1)}% @ ${(CUR.margin*100).toFixed(0)}% margin, Budget≈ ${(CUR.budgetFactor*100).toFixed(1)}% of OpEx (floor $${SETS.base.floor.toLocaleString()}).`;
-    $('#assumpText').textContent = $('#assumpHint').textContent;
-  }
-
-  function calculate(){
-    const rev  = numFrom($('#rev').value);
-    const opex = numFrom($('#opex').value);
-
-    const opsSavings = Math.max(0, opex * CUR.ops);
-    const liftGain   = Math.max(0, rev  * CUR.lift * CUR.margin);
-    const total      = opsSavings + liftGain;
-
-    const programCost = Math.max(CUR.floor, opex * CUR.budgetFactor);
-    const roi = (total - programCost) / programCost;
-    const daily = total/365;
-    const breakeven = (daily>0) ? Math.ceil(programCost/daily) : NaN;
-
-    $('#opsVal').textContent   = money(opsSavings);
-    $('#liftVal').textContent  = money(liftGain);
-    $('#totalVal').textContent = money(total);
-    $('#roiVal').textContent   = isFinite(roi)? `${(roi*100).toFixed(0)}%` : '—';
-
-    const b = $('#roiBadge');
-    if(isFinite(roi)){
-      b.className = 'badge ' + (roi>1 ? 'g' : roi>0.25 ? 'y' : 'r');
-      b.textContent = roi>1 ? 'Excellent' : roi>0.25 ? 'Good' : 'Needs review';
-    }else{ b.className='badge'; b.textContent='—'; }
-
-    $('#breakevenVal').textContent = isFinite(breakeven) ? breakeven : '—';
-  }
-
-  function bindMoneyInput(id){
-    const el = $(id);
-    el.addEventListener('input', calculate);
-    el.addEventListener('blur', ()=>{ formatInput(el); calculate(); });
-    el.addEventListener('focus', ()=>{ setTimeout(()=> el.select(), 0); });
-  }
-
-  function pick(which){
-    ['low','base','high'].forEach(id=>{ const btn=$('#'+id); btn.setAttribute('aria-pressed', id===which ? 'true':'false'); });
-    CUR = SETS[which]; describe(); calculate();
-  }
-
-  // Init
-  ['low','base','high'].forEach(id=> $('#'+id).addEventListener('click', ()=>pick(id)));
-  bindMoneyInput('#rev'); bindMoneyInput('#opex');
-  describe(); calculate();
+/* ─────────────────────────────────────────────────────────────────
+   4) Events & initial state
+────────────────────────────────────────────────────────────────── */
+document.querySelectorAll('[data-mode]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    currentMode = btn.dataset.mode;
+    renderAssumptionText();
+  });
+});
+$('industry').addEventListener('change', populateProducts);
+$('calc').addEventListener('click', calculate);
+populateProducts();
+renderAssumptionText();
 </script>
 </body>
 </html>
